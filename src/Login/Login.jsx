@@ -15,8 +15,8 @@ function LoginForm() {
   };
 
   return (
-    <div className="login-container d-flex  align-items-center vh-100" style={{ marginLeft: '20%',backgroundImage: 'url(D:/4. Sinau Project/pos-sederhana/src/assets/KRanYO83.png)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
-      <div className="card shadow" style={{ maxWidth: '400px', borderRadius: '15px' }}>
+    <div className="login-container d-flex  align-items-center vh-100" style={{ backgroundImage: 'url(D:/4. Sinau Project/pos-sederhana/src/assets/KRanYO83.png)', backgroundSize: '100% 100%', backgroundPosition: 'center',  }}>
+      <div className="card shadow" style={{ marginLeft: '20%',maxWidth: '400px', borderRadius: '15px' }}>
         <div className="card-body p-4">
           <div className="text-center mb-4">
             <img src={logo} alt="Logo" className="mb-3" />
