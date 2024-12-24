@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Link } from 'react-router-dom';
 import logo from '../assets/logo.png';
 // import './LoginForm.css'; // Tambahkan file CSS untuk styling tambahan
 
@@ -54,7 +55,10 @@ function LoginForm() {
             <button type="submit" className="btn btn-primary w-100">Login</button>
           </form>
           <div className="text-center mt-3">
-            <p className="mb-0">Don’t have an account? <a href="#" className="text-primary text-decoration-none">Register</a></p>
+            <p className="mb-0">
+              Don’t have an account?{' '}
+              <Link to="/register" className="text-primary text-decoration-none">Register</Link>
+            </p>
           </div>
         </div>
       </div>
