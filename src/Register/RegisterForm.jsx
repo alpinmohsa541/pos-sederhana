@@ -27,7 +27,7 @@ function RegisterForm() {
       style={{
         backgroundImage: "url(/assets/cover-bg.png)",
         backgroundSize: "cover",
-        backgroundPositionY: "1px",
+        backgroundPosition: "top",
       }}
     >
       <div
