@@ -4,23 +4,12 @@ import menuData from "./DataMenu";
 
 const CashierDashboard = () => {
   const [activeButton, setActiveButton] = useState("All Menu");
-  const [orders, setOrders] = useState([]); // Tambahkan state untuk daftar pesanan
 
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
   };
 
-  // Tambahkan menu ke daftar pesanan
-  const addToOrder = (menu) => {
-    setOrders((prevOrders) => [...prevOrders, menu]);
-  };
-
-  // Hapus menu dari daftar pesanan
-  const removeFromOrder = (index) => {
-    setOrders((prevOrders) => prevOrders.filter((_, i) => i !== index));
-  };
-
-  // Filter menu berdasarkan kategori yang aktif
+  // Filter menu berdasarkan kategori
   const filteredMenu =
     activeButton === "All Menu"
       ? menuData
@@ -31,7 +20,6 @@ const CashierDashboard = () => {
       <div className="row g-0">
         {/* Sidebar */}
         <div className="col-md-1 bg-light vh-100 d-flex flex-column align-items-center p-3">
-          {/* Logo */}
           <div
             className="rounded-circle text-white d-flex justify-content-center align-items-center mb-5"
             style={{
@@ -43,39 +31,35 @@ const CashierDashboard = () => {
           >
             P
           </div>
-          {/* Icons */}
+
           <div className="arrow-right-icon mb-5">
             <i
               className="bi bi-arrow-right-circle"
               style={{ fontSize: "1.5rem", color: "#6392F3" }}
             ></i>
           </div>
-          <div className="mb-5" title="Shop">
-            <img
-              src="/assets/shop.svg"
-              alt="Shop Icon"
-              style={{ width: "30px", height: "30px" }}
-            />
-          </div>
-          <div className="mb-5" title="clipboard-text">
-            <img
-              src="/assets/clipboard-text.svg"
-              alt="clipboard"
-              style={{ width: "30px", height: "30px" }}
-            />
-          </div>
-          <div className="mb-5" title="setting">
-            <img
-              src="/assets/setting-2.svg"
-              alt="setting"
-              style={{ width: "30px", height: "30px" }}
-            />
-          </div>
+
+          {[
+            { src: "/assets/shop.svg", alt: "Shop Icon", title: "Shop" },
+            {
+              src: "/assets/clipboard-text.svg",
+              alt: "Clipboard",
+              title: "Clipboard",
+            },
+            { src: "/assets/setting-2.svg", alt: "Setting", title: "Setting" },
+          ].map((icon, index) => (
+            <div key={index} className="mb-5" title={icon.title}>
+              <img
+                src={icon.src}
+                alt={icon.alt}
+                style={{ width: "30px", height: "30px" }}
+              />
+            </div>
+          ))}
         </div>
 
         {/* Main Content */}
         <div className="col-md-11">
-          {/* Navbar */}
           <nav
             className="navbar navbar-expand-lg navbar-light bg-light px-4"
             style={{ height: "80px" }}
@@ -97,6 +81,7 @@ const CashierDashboard = () => {
                   />
                 </div>
               </form>
+
               <div className="d-flex align-items-center me-4">
                 <img
                   src="/assets/archive-add.svg"
@@ -105,11 +90,17 @@ const CashierDashboard = () => {
                 />
                 <span style={{ padding: "10px" }}>Order Archive</span>
               </div>
+
               <div className="d-flex align-items-center">
                 <img
                   src="/assets/profile.svg"
+                  className="profile me-2"
                   alt="Profile Icon"
-                  style={{ fontSize: "60px", padding: "5px" }}
+                  style={{
+                    fontSize: "60px",
+                    padding: "5px",
+                    color: "#6392F3",
+                  }}
                 />
                 <div className="d-flex flex-column">
                   <span className="me-3" style={{ fontSize: "1.2rem" }}>
@@ -129,68 +120,76 @@ const CashierDashboard = () => {
             </div>
           </nav>
 
-          <div className="row">
-            {/* Menu List */}
-            <div className="col-md-8">
-              <div className="row g-4 px-4">
-                {filteredMenu.slice(0, 16).map((menu) => (
-                  <div key={menu.id} className="col-md-3 d-flex">
-                    <div className="card h-100 w-100">
-                      <img
-                        src={menu.image}
-                        className="card-img-top"
-                        alt={menu.name}
-                        style={{ height: "150px", objectFit: "cover" }}
-                      />
-                      <div className="card-body d-flex flex-column">
-                        <h5 className="card-title">{menu.name}</h5>
-                        <p className="card-text text-muted">
-                          {menu.description}
-                        </p>
-                        <p className="card-text text-primary">
-                          {menu.price} /portion
-                        </p>
-                        <button
-                          className="btn btn-primary mt-auto"
-                          onClick={() => addToOrder(menu)}
-                        >
-                          Add to Order
-                        </button>
-                      </div>
-                    </div>
+          <div className="d-flex justify-content-start gap-3 p-4">
+            {[
+              { name: "All Menu" },
+              { name: "Food", icon: "/assets/reserve.svg" },
+              { name: "Beverages", icon: "/assets/coffee.svg" },
+              { name: "Dessert", icon: "/assets/cake.svg" },
+            ].map((category) => (
+              <button
+                key={category.name}
+                className={`btn btn-category d-flex align-items-center justify-content-center ${
+                  activeButton === category.name ? "active" : ""
+                }`}
+                style={{
+                  padding: "5px 10px",
+                  width: "175px",
+                  height: "55px",
+                  borderColor: "#C4C4C4",
+                }}
+                onClick={() => handleButtonClick(category.name)}
+              >
+                {category.icon && (
+                  <img
+                    src={category.icon}
+                    alt={`${category.name} Icon`}
+                    style={{
+                      width: "20px",
+                      height: "20px",
+                      marginRight: "8px",
+                    }}
+                  />
+                )}
+                {category.name}
+              </button>
+            ))}
+          </div>
+          <div className="row g-4 px-4">
+            {filteredMenu.map((menu) => (
+              <div key={menu.id} className="col-md-3">
+                <div className="card h-100 position-relative">
+                  {/* Badge kategori di pojok kanan atas */}
+                  <span
+                    className="badge bg-primary"
+                    style={{
+                      fontSize: "0.8rem",
+                      padding: "5px 10px",
+                      borderRadius: "20px",
+                      position: "absolute",
+                      top: "10px",
+                      right: "10px",
+                      zIndex: "10",
+                    }}
+                  >
+                    {menu.category}
+                  </span>
+                  <img
+                    src={menu.image}
+                    className="card-img-top"
+                    alt={menu.name}
+                    style={{ height: "150px", objectFit: "cover" }}
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title">{menu.name}</h5>
+                    <p className="card-text text-muted">{menu.description}</p>
+                    <p className="card-text text-primary">
+                      {menu.price} /portion
+                    </p>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Order List */}
-            <div className="col-md-4">
-              <h4 className="mb-3">Order List</h4>
-              <div className="card">
-                <div className="card-body">
-                  {orders.length === 0 ? (
-                    <p className="text-muted">No items in the order.</p>
-                  ) : (
-                    <ul className="list-group">
-                      {orders.map((order, index) => (
-                        <li
-                          key={index}
-                          className="list-group-item d-flex justify-content-between align-items-center"
-                        >
-                          <span>{order.name}</span>
-                          <button
-                            className="btn btn-sm btn-danger"
-                            onClick={() => removeFromOrder(index)}
-                          >
-                            Remove
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
