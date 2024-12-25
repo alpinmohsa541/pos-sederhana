@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./Login/LoginForm"; // Sesuaikan path jika berbeda
+import Login from "./CashierDashboard/CashierDashboard"; // Sesuaikan path jika berbeda
 import Register from "./Register/RegisterForm"; // Sesuaikan path jika berbeda
 import "bootstrap/dist/css/bootstrap.min.css";
 import Reset from "./ResetPassword/EmailForm";
