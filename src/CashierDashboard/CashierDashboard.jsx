@@ -58,38 +58,64 @@ const CashierDashboard = () => {
         {/* Main Content */}
         <div className="col-md-11">
           {/* Navbar */}
-          <nav className="navbar navbar-expand-lg navbar-light bg-light px-4">
+          <nav
+            className="navbar navbar-expand-lg navbar-light bg-light px-4"
+            style={{ width: "100%", height: "80px" }}
+          >
             <div className="container-fluid">
               {/* Search Bar */}
-              <form className="d-flex me-auto">
-                <input
-                  className="form-control me-2"
-                  type="search"
-                  placeholder="Search"
-                  aria-label="Search"
-                />
+              <form className="d-flex me-auto" style={{ width: "450px" }}>
+                <div className="input-group">
+                  <span className="input-group-text bg-white border-end-0">
+                    <i
+                      className="bi bi-search"
+                      style={{ fontSize: "1.2rem", color: "#6392F3" }}
+                    ></i>
+                  </span>
+                  <input
+                    className="form-control border-start-0"
+                    type="search"
+                    placeholder="Enter the keyword here..."
+                    aria-label="Search"
+                  />
+                </div>
               </form>
 
               {/* Order Archive */}
               <div className="d-flex align-items-center me-4">
-                <i
-                  className="bi bi-archive me-2"
-                  style={{ fontSize: "1.5rem", color: "#6392F3" }}
-                ></i>
-                <span>Order Archive</span>
+                <img
+                  src="/assets/archive-add.svg"
+                  alt="Order Archive Icon"
+                  style={{ width: "20px", height: "20px", marginRight: "8px" }}
+                />
+                <span style={{ padding: "10px" }}>Order Archive</span>
               </div>
 
               {/* Profile and Logout */}
               <div className="d-flex align-items-center">
-                <i
-                  className="bi bi-person-circle me-2"
-                  style={{ fontSize: "1.5rem", color: "#6392F3" }}
-                ></i>
-                <span className="me-3">John Doe</span>
-                <i
-                  className="bi bi-box-arrow-right"
-                  style={{ fontSize: "1.5rem", color: "#6392F3" }}
-                ></i>
+                <img
+                  src="/assets/profile.svg"
+                  className="profile me-2"
+                  style={{
+                    fontSize: "60px",
+                    padding: "5px",
+                    color: "#6392F3",
+                  }}
+                ></img>
+                <div className="d-flex flex-column">
+                  <span className="me-3" style={{ fontSize: "1.2rem" }}>
+                    John Doe
+                  </span>
+                  <small style={{ fontSize: "0.9rem", color: "#6c757d" }}>
+                    Cashier
+                  </small>
+                </div>
+                <img
+                  src="/assets/logout.svg"
+                  alt="logout Icon"
+                  className="bi bi-box-arrow-right ms-3"
+                  style={{ width: "24px" }}
+                ></img>
               </div>
             </div>
           </nav>
