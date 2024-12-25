@@ -20,8 +20,8 @@ const CashierDashboard = () => {
               P
             </div>
 
-            {/* Arrow Right Circle Icon Below the Logo */}
-            <div className="mb-5">
+            {/* Arrow Right Circle Icon with Border */}
+            <div className="arrow-right-icon mb-5">
               <i
                 className="bi bi-arrow-right-circle"
                 style={{ fontSize: "1.5rem", color: "#6392F3" }}

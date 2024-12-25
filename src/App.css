@@ -45,3 +45,25 @@ div[title="setting"]:hover img {
   transform: scale(1.1); /* Slightly enlarge the icon */
   transition: filter 0.3s ease, transform 0.3s ease;
 }
+
+/* border arrow right */
+/* .arrow-right-icon {
+  position: relative;
+  padding: 5 px 0;
+}
+
+.arrow-right-icon::before,
+.arrow-right-icon::after {
+  content: "";
+  position: absolute;
+  left: 50%; /* Center the border 
+  transform: translateX(-50%);
+  width: 50px; /* Panjang border 
+  border-top: 2px solid #6392f3; /* Top border 
+}
+
+.arrow-right-icon::after {
+  top: 100%; /* Bottom border 
+  border-top: none;
+  border-bottom: 2px solid #6392f3;
+} */
