@@ -54,6 +54,12 @@ const CashierDashboard = () => {
 
   // Menangani klik menu
   const handleShowModalOrAddOrder = (menu) => {
+    if (!orderType) {
+      // Jika belum memilih Dine In atau Take Away, tampilkan alert
+      alert("Please select 'Dine In' or 'Take Away' first!");
+      return; // Hentikan eksekusi jika belum memilih
+    }
+
     if (orderType === "dineIn") {
       // Jika Dine In, langsung tambahkan menu ke summary order
       handleAddToOrder(menu);
@@ -308,9 +314,22 @@ const CashierDashboard = () => {
                 {orders.map((order, index) => (
                   <li
                     key={index}
-                    className="list-group-item d-flex justify-content-between"
+                    className="list-group-item d-flex align-items-center justify-content-between"
+                    style={{ gap: "10px" }}
                   >
-                    <span>{order.name}</span>
+                    <img
+                      src={order.image}
+                      alt={order.name}
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        objectFit: "cover",
+                        borderRadius: "5px",
+                      }}
+                    />
+                    <div className="flex-grow-1">
+                      <strong>{order.name}</strong>
+                    </div>
                     <span>{order.price}</span>
                   </li>
                 ))}
@@ -322,10 +341,10 @@ const CashierDashboard = () => {
               </div>
 
               <button
-                className="btn btn-success w-100 mt-3"
+                className="btn btn-primary w-100 mt-3"
                 onClick={handleArchiveOrder}
               >
-                Archive Order
+                Pay
               </button>
             </div>
           </div>
