@@ -46,6 +46,17 @@ div[title="setting"]:hover img {
   transition: filter 0.3s ease, transform 0.3s ease;
 }
 
+.btn-category:hover {
+  background-color: #6392f3;
+  color: white;
+}
+
+.btn-category.active {
+  background-color: #3572ef;
+  color: white;
+  border-color: #3572ef;
+}
+
 /* border arrow right */
 /* .arrow-right-icon {
   position: relative;

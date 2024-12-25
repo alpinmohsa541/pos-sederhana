@@ -1,6 +1,13 @@
 import "../App.css";
+import { useState } from "react";
 
 const CashierDashboard = () => {
+  const [activeButton, setActiveButton] = useState("All Menu");
+
+  const handleButtonClick = (buttonName) => {
+    setActiveButton(buttonName);
+  };
+
   return (
     <div className="container-fluid p-0">
       <div className="row g-0">
@@ -120,45 +127,38 @@ const CashierDashboard = () => {
             </div>
           </nav>
 
-          {/* Category Tabs */}
-          <ul className="nav nav-tabs">
-            <li className="nav-item">
-              <button className="nav-link active">All Menu</button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link">Foods</button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link">Beverages</button>
-            </li>
-            <li className="nav-item">
-              <button className="nav-link">Dessert</button>
-            </li>
-          </ul>
-
-          {/* Menu Items */}
-          <div className="row mt-3">
-            {[...Array(12)].map((_, index) => (
-              <div className="col-md-3 mb-3" key={index}>
-                <div className="card">
-                  <img
-                    src="https://via.placeholder.com/150"
-                    className="card-img-top"
-                    alt="Menu Item"
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">Gado-gado Special</h5>
-                    <p className="card-text text-muted">
-                      Vegetables, egg, tempe, tofu, ketupat, peanut sauce, and
-                      kerupuk
-                    </p>
-                    <p className="card-text">Rp 20.000/portion</p>
-                    <button className="btn btn-primary w-100">
-                      Add to Order
-                    </button>
-                  </div>
-                </div>
-              </div>
+          {/* Category Buttons with Icons */}
+          <div className="d-flex justify-content-start gap-3 p-4">
+            {[
+              { name: "All Menu" },
+              { name: "Food", icon: "/assets/reserve.svg" },
+              { name: "Beverages", icon: "/assets/coffee.svg" },
+              { name: "Dessert", icon: "/assets/cake.svg" },
+            ].map((category) => (
+              <button
+                key={category.name}
+                className={`btn btn-category d-flex align-items-center justify-content-center ${
+                  activeButton === category.name ? "active" : ""
+                }`}
+                style={{
+                  padding: "5px 10px",
+                  width: "175px",
+                  height: "55px",
+                  borderColor: "#C4C4C4",
+                }}
+                onClick={() => handleButtonClick(category.name)}
+              >
+                <img
+                  src={category.icon}
+                  alt={`${category.name} Icon`}
+                  style={{
+                    width: "20px",
+                    height: "20px",
+                    marginRight: "8px",
+                  }}
+                />
+                {category.name}
+              </button>
             ))}
           </div>
         </div>
