@@ -31,31 +31,17 @@ div[title="Shop"]:hover img {
   transition: filter 0.3s ease, transform 0.3s ease;
 }
 
-/* Clipboard Icon Hover Effect */
-div[title="clipboard-text"]:hover img {
-  filter: brightness(0) saturate(100%) invert(39%) sepia(60%) saturate(617%)
-    hue-rotate(202deg) brightness(96%) contrast(95%);
-  transform: scale(1.1); /* Slightly enlarge the icon */
-  transition: filter 0.3s ease, transform 0.3s ease;
-}
-
-/* Setting Icon Hover Effect */
-div[title="setting"]:hover img {
-  filter: brightness(0) saturate(100%) invert(39%) sepia(60%) saturate(617%)
-    hue-rotate(202deg) brightness(96%) contrast(95%);
-  transform: scale(1.1); /* Slightly enlarge the icon */
-  transition: filter 0.3s ease, transform 0.3s ease;
-}
-
+/* Hover effect for the category button */
 .btn-category:hover {
-  background-color: #6392f3;
+  background-color: #6392f3; /* Blue on hover */
   color: white;
 }
 
+/* Active button styles */
 .btn-category.active {
-  background-color: #3572ef;
+  background-color: #3572ef; /* Dark blue when active */
   color: white;
-  border-color: #3572ef;
+  border-color: #3572ef; /* Border matches the background */
 }
 
 /* border arrow right */

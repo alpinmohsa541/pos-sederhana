@@ -4,16 +4,29 @@ import menuData from "./DataMenu";
 
 const CashierDashboard = () => {
   const [activeButton, setActiveButton] = useState("All Menu");
+  const [searchQuery, setSearchQuery] = useState(""); // Added state for search query
 
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
   };
 
-  // Filter menu berdasarkan kategori
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Filter menu based on category and search query
   const filteredMenu =
     activeButton === "All Menu"
-      ? menuData
-      : menuData.filter((menu) => menu.category === activeButton);
+      ? menuData.filter(
+          (menu) => menu.name.toLowerCase().includes(searchQuery.toLowerCase()) // Search logic
+        )
+      : menuData
+          .filter((menu) => menu.category === activeButton)
+          .filter(
+            (menu) =>
+              menu.name.toLowerCase().includes(searchQuery.toLowerCase()) // Search logic
+          );
 
   return (
     <div className="container-fluid p-0">
@@ -78,6 +91,8 @@ const CashierDashboard = () => {
                     type="search"
                     placeholder="Enter the keyword here..."
                     aria-label="Search"
+                    value={searchQuery} // Bind value to searchQuery state
+                    onChange={handleSearchChange} // Handle change event
                   />
                 </div>
               </form>
@@ -156,6 +171,19 @@ const CashierDashboard = () => {
             ))}
           </div>
           <div className="row g-4 px-4">
+            <h2>List Menu</h2>
+            <div
+              className="position-absolute"
+              style={{
+                left: "1380px",
+                fontSize: "1rem",
+                padding: "5px 10px",
+                borderRadius: "5px",
+                color: "#6c757d",
+              }}
+            >
+              Total: {filteredMenu.length} Menu
+            </div>
             {filteredMenu.map((menu) => (
               <div key={menu.id} className="col-md-3">
                 <div className="card h-100 position-relative">
