@@ -1,12 +1,30 @@
 import "../App.css";
 import { useState } from "react";
+import menuData from "./DataMenu";
 
 const CashierDashboard = () => {
   const [activeButton, setActiveButton] = useState("All Menu");
+  const [orders, setOrders] = useState([]); // Tambahkan state untuk daftar pesanan
 
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
   };
+
+  // Tambahkan menu ke daftar pesanan
+  const addToOrder = (menu) => {
+    setOrders((prevOrders) => [...prevOrders, menu]);
+  };
+
+  // Hapus menu dari daftar pesanan
+  const removeFromOrder = (index) => {
+    setOrders((prevOrders) => prevOrders.filter((_, i) => i !== index));
+  };
+
+  // Filter menu berdasarkan kategori yang aktif
+  const filteredMenu =
+    activeButton === "All Menu"
+      ? menuData
+      : menuData.filter((menu) => menu.category === activeButton);
 
   return (
     <div className="container-fluid p-0">
@@ -25,16 +43,13 @@ const CashierDashboard = () => {
           >
             P
           </div>
-
-          {/* Arrow Right Circle Icon with Border */}
+          {/* Icons */}
           <div className="arrow-right-icon mb-5">
             <i
               className="bi bi-arrow-right-circle"
               style={{ fontSize: "1.5rem", color: "#6392F3" }}
             ></i>
           </div>
-
-          {/* Shop Icon */}
           <div className="mb-5" title="Shop">
             <img
               src="/assets/shop.svg"
@@ -42,8 +57,6 @@ const CashierDashboard = () => {
               style={{ width: "30px", height: "30px" }}
             />
           </div>
-
-          {/* Clipboard Icon */}
           <div className="mb-5" title="clipboard-text">
             <img
               src="/assets/clipboard-text.svg"
@@ -51,8 +64,6 @@ const CashierDashboard = () => {
               style={{ width: "30px", height: "30px" }}
             />
           </div>
-
-          {/* Setting Icon */}
           <div className="mb-5" title="setting">
             <img
               src="/assets/setting-2.svg"
@@ -67,10 +78,9 @@ const CashierDashboard = () => {
           {/* Navbar */}
           <nav
             className="navbar navbar-expand-lg navbar-light bg-light px-4"
-            style={{ width: "100%", height: "80px" }}
+            style={{ height: "80px" }}
           >
             <div className="container-fluid">
-              {/* Search Bar */}
               <form className="d-flex me-auto" style={{ width: "450px" }}>
                 <div className="input-group">
                   <span className="input-group-text bg-white border-end-0">
@@ -87,8 +97,6 @@ const CashierDashboard = () => {
                   />
                 </div>
               </form>
-
-              {/* Order Archive */}
               <div className="d-flex align-items-center me-4">
                 <img
                   src="/assets/archive-add.svg"
@@ -97,18 +105,12 @@ const CashierDashboard = () => {
                 />
                 <span style={{ padding: "10px" }}>Order Archive</span>
               </div>
-
-              {/* Profile and Logout */}
               <div className="d-flex align-items-center">
                 <img
                   src="/assets/profile.svg"
-                  className="profile me-2"
-                  style={{
-                    fontSize: "60px",
-                    padding: "5px",
-                    color: "#6392F3",
-                  }}
-                ></img>
+                  alt="Profile Icon"
+                  style={{ fontSize: "60px", padding: "5px" }}
+                />
                 <div className="d-flex flex-column">
                   <span className="me-3" style={{ fontSize: "1.2rem" }}>
                     John Doe
@@ -119,47 +121,76 @@ const CashierDashboard = () => {
                 </div>
                 <img
                   src="/assets/logout.svg"
-                  alt="logout Icon"
-                  className="bi bi-box-arrow-right ms-3"
+                  alt="Logout Icon"
+                  className="ms-3"
                   style={{ width: "24px" }}
-                ></img>
+                />
               </div>
             </div>
           </nav>
 
-          {/* Category Buttons with Icons */}
-          <div className="d-flex justify-content-start gap-3 p-4">
-            {[
-              { name: "All Menu" },
-              { name: "Food", icon: "/assets/reserve.svg" },
-              { name: "Beverages", icon: "/assets/coffee.svg" },
-              { name: "Dessert", icon: "/assets/cake.svg" },
-            ].map((category) => (
-              <button
-                key={category.name}
-                className={`btn btn-category d-flex align-items-center justify-content-center ${
-                  activeButton === category.name ? "active" : ""
-                }`}
-                style={{
-                  padding: "5px 10px",
-                  width: "175px",
-                  height: "55px",
-                  borderColor: "#C4C4C4",
-                }}
-                onClick={() => handleButtonClick(category.name)}
-              >
-                <img
-                  src={category.icon}
-                  alt={`${category.name} Icon`}
-                  style={{
-                    width: "20px",
-                    height: "20px",
-                    marginRight: "8px",
-                  }}
-                />
-                {category.name}
-              </button>
-            ))}
+          <div className="row">
+            {/* Menu List */}
+            <div className="col-md-8">
+              <div className="row g-4 px-4">
+                {filteredMenu.slice(0, 16).map((menu) => (
+                  <div key={menu.id} className="col-md-3 d-flex">
+                    <div className="card h-100 w-100">
+                      <img
+                        src={menu.image}
+                        className="card-img-top"
+                        alt={menu.name}
+                        style={{ height: "150px", objectFit: "cover" }}
+                      />
+                      <div className="card-body d-flex flex-column">
+                        <h5 className="card-title">{menu.name}</h5>
+                        <p className="card-text text-muted">
+                          {menu.description}
+                        </p>
+                        <p className="card-text text-primary">
+                          {menu.price} /portion
+                        </p>
+                        <button
+                          className="btn btn-primary mt-auto"
+                          onClick={() => addToOrder(menu)}
+                        >
+                          Add to Order
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Order List */}
+            <div className="col-md-4">
+              <h4 className="mb-3">Order List</h4>
+              <div className="card">
+                <div className="card-body">
+                  {orders.length === 0 ? (
+                    <p className="text-muted">No items in the order.</p>
+                  ) : (
+                    <ul className="list-group">
+                      {orders.map((order, index) => (
+                        <li
+                          key={index}
+                          className="list-group-item d-flex justify-content-between align-items-center"
+                        >
+                          <span>{order.name}</span>
+                          <button
+                            className="btn btn-sm btn-danger"
+                            onClick={() => removeFromOrder(index)}
+                          >
+                            Remove
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

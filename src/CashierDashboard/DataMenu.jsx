@@ -1,0 +1,103 @@
+// Data menu
+const menuData = [
+  {
+    id: 1,
+    name: "Gado-gado Special",
+    description:
+      "Vegetables, egg, tempe, tofu, ketupat, peanut sauce, and kerupuk.",
+    price: "Rp 20.000",
+    category: "Food",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 2,
+    name: "Es Teh Manis",
+    description: "Refreshing iced tea with a sweet taste.",
+    price: "Rp 5.000",
+    category: "Beverages",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 3,
+    name: "Black Forest Cake",
+    description: "Rich chocolate cake with cherry toppings.",
+    price: "Rp 30.000",
+    category: "Dessert",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 4,
+    name: "Nasi Goreng Special",
+    description: "Fried rice with egg, chicken, and vegetables.",
+    price: "Rp 25.000",
+    category: "Food",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 5,
+    name: "Nasi Goreng Special",
+    description: "Fried rice with egg, chicken, and vegetables.",
+    price: "Rp 25.000",
+    category: "Food",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 6,
+    name: "Gado-gado Special",
+    description:
+      "Vegetables, egg, tempe, tofu, ketupat, peanut sauce, and kerupuk.",
+    price: "Rp 20.000",
+    category: "Food",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 7,
+    name: "Es Teh Manis",
+    description: "Refreshing iced tea with a sweet taste.",
+    price: "Rp 5.000",
+    category: "Beverages",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 8,
+    name: "Black Forest Cake",
+    description: "Rich chocolate cake with cherry toppings.",
+    price: "Rp 30.000",
+    category: "Dessert",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 9,
+    name: "Nasi Goreng Special",
+    description: "Fried rice with egg, chicken, and vegetables.",
+    price: "Rp 25.000",
+    category: "Food",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 10,
+    name: "Es Teh Manis",
+    description: "Refreshing iced tea with a sweet taste.",
+    price: "Rp 5.000",
+    category: "Beverages",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 11,
+    name: "Black Forest Cake",
+    description: "Rich chocolate cake with cherry toppings.",
+    price: "Rp 30.000",
+    category: "Dessert",
+    image: "/assets/image5.svg",
+  },
+  {
+    id: 12,
+    name: "Nasi Goreng Special",
+    description: "Fried rice with egg, chicken, and vegetables.",
+    price: "Rp 25.000",
+    category: "Food",
+    image: "/assets/image5.svg",
+  },
+];
+
+export default menuData;
