@@ -1,13 +1,13 @@
-import { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { Link } from 'react-router-dom';
-import logo from '../assets/logo.png';
+import { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { Link } from "react-router-dom";
+import logo from "/assets/logo.png";
 
 function RegisterForm() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,9 +15,9 @@ function RegisterForm() {
       alert("Passwords do not match!");
       return;
     }
-    console.log('Username:', username);
-    console.log('Email:', email);
-    console.log('Password:', password);
+    console.log("Username:", username);
+    console.log("Email:", email);
+    console.log("Password:", password);
     // Tambahkan logika untuk registrasi di sini
   };
 
@@ -25,12 +25,15 @@ function RegisterForm() {
     <div
       className="register-container d-flex align-items-center vh-100"
       style={{
-        backgroundImage: 'url(D:/4. Sinau Project/pos-sederhana/src/assets/KRanYO83.png)',
-        backgroundSize: '100% 100%',
-        backgroundPosition: 'center',
+        backgroundImage: "url(/assets/cover-bg.png)",
+        backgroundSize: "cover",
+        backgroundPositionY: "1px",
       }}
     >
-      <div className="card shadow" style={{ marginLeft: '20%', maxWidth: '400px', borderRadius: '15px' }}>
+      <div
+        className="card shadow"
+        style={{ marginLeft: "20%", maxWidth: "400px", borderRadius: "15px" }}
+      >
         <div className="card-body p-4">
           <div className="text-center mb-4">
             <img src={logo} alt="Logo" className="mb-3" />
@@ -39,7 +42,9 @@ function RegisterForm() {
           </div>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="username" className="form-label">Username</label>
+              <label htmlFor="username" className="form-label">
+                Username
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -51,7 +56,9 @@ function RegisterForm() {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">Email</label>
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
               <input
                 type="email"
                 className="form-control"
@@ -63,7 +70,9 @@ function RegisterForm() {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="password" className="form-label">Password</label>
+              <label htmlFor="password" className="form-label">
+                Password
+              </label>
               <input
                 type="password"
                 className="form-control"
@@ -75,7 +84,9 @@ function RegisterForm() {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+              <label htmlFor="confirmPassword" className="form-label">
+                Confirm Password
+              </label>
               <input
                 type="password"
                 className="form-control"
@@ -86,15 +97,19 @@ function RegisterForm() {
                 required
               />
             </div>
-            <button type="submit" className="btn btn-primary w-100">Register</button>
+            <button type="submit" className="btn btn-primary w-100">
+              Register
+            </button>
           </form>
           {/* <div className="text-center mt-3">
             <p className="mb-0">Already have an account? <a href="#" className="text-primary text-decoration-none">Login</a></p>
           </div> */}
           <div className="text-center mt-3">
             <p className="mb-0">
-            Already have an account?{' '}
-              <Link to="/login" className="text-primary text-decoration-none">Login</Link>
+              Already have an account?{" "}
+              <Link to="/" className="text-primary text-decoration-none">
+                Login
+              </Link>
             </p>
           </div>
         </div>
