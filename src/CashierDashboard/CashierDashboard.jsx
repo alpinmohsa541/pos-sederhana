@@ -324,7 +324,7 @@ const CashierDashboard = () => {
             </div>
 
             {/* Order Summary */}
-            <div className="bg-light p-4" style={{ width: "300px" }}>
+            <div className="bg-light p-4" style={{ width: "5000px" }}>
               <h3>List Order</h3>
               <p
                 className="no-order"
@@ -451,6 +451,7 @@ const CashierDashboard = () => {
           </div>
         </div>
       </div>
+
       {/* Modal */}
       {showModal && selectedMenu && (
         <div
