@@ -262,6 +262,18 @@ const CashierDashboard = () => {
               {/* Menu List */}
               <div className="row g-4 px-4">
                 <h2>List Menu</h2>
+                <div
+                  className="position-absolute"
+                  style={{
+                    left: "780px",
+                    fontSize: "1rem",
+                    padding: "5px 10px",
+                    borderRadius: "5px",
+                    color: "#6c757d",
+                  }}
+                >
+                  Total: {filteredMenu.length} Menu
+                </div>
                 <div className="col-md-12">
                   <div className="row row-cols-1 row-cols-md-4 g-2">
                     {filteredMenu.map((menu) => (
@@ -322,9 +334,13 @@ const CashierDashboard = () => {
                 </div>
               </div>
             </div>
-
-            {/* Order Summary */}
-            <div className="bg-light p-4" style={{ width: "5000px" }}>
+            <div
+              className="bg-light p-4 d-flex flex-column"
+              style={{
+                width: "4800px",
+                height: "800px",
+              }} /* Sesuaikan ukuran yang realistis */
+            >
               <h3>List Order</h3>
               <p
                 className="no-order"
@@ -354,28 +370,29 @@ const CashierDashboard = () => {
                   Take Away
                 </button>
               </div>
-
               <div className="mt-3">
-                <div className="mb-3 w-100">
-                  <label
-                    style={{ fontSize: "15px" }}
-                    htmlFor="customerName"
-                    className="form-label"
-                  >
-                    Customer Name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="customerName"
-                    placeholder="Customer name"
-                    style={{ fontSize: "15px" }}
-                  />
-                </div>
+                <div className="d-flex justify-content-between gap-3">
+                  {/* Customer Name */}
+                  <div className="w-50">
+                    <label
+                      style={{ fontSize: "15px" }}
+                      htmlFor="customerName"
+                      className="form-label"
+                    >
+                      Customer Name
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      id="customerName"
+                      placeholder="Customer name"
+                      style={{ fontSize: "15px" }}
+                    />
+                  </div>
 
-                {orderType === "dineIn" && (
-                  <div className="d-flex justify-content-between gap-2">
-                    <div className="w-100">
+                  {/* No Table */}
+                  {orderType === "dineIn" && (
+                    <div className="w-50">
                       <label
                         style={{ fontSize: "15px" }}
                         htmlFor="tableNumber"
@@ -391,63 +408,78 @@ const CashierDashboard = () => {
                         ))}
                       </select>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
 
-              <ul className="list-group">
-                {orders.map((order, index) => (
-                  <li
-                    key={index}
-                    className="list-group-item d-flex align-items-center justify-content-between"
-                    style={{ gap: "10px" }}
-                  >
-                    <img
-                      src={order.image}
-                      alt={order.name}
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                        borderRadius: "5px",
-                      }}
-                    />
-                    <div className="flex-grow-1">
-                      <strong>{order.name}</strong>
-                      <div className="d-flex align-items-center gap-2 mt-1">
-                        <button
-                          className="btn btn-sm btn-outline-secondary"
-                          onClick={() => handleDecreaseOrder(order.id)}
-                          disabled={order.quantity <= 1}
-                        >
-                          -
-                        </button>
-                        <span>{order.quantity}</span>
-                        <button
-                          className="btn btn-sm btn-outline-secondary"
-                          onClick={() => handleIncreaseOrder(order.id)}
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    <span>{order.price * order.quantity}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-3 d-flex justify-content-between">
-                <strong>Total:</strong>
-                <strong>{total}</strong>
-              </div>
-
-              <button
-                className="btn btn-primary w-100 mt-3"
-                onClick={handleArchiveOrder}
+              {/* Scrollable List Group */}
+              <div
+                className="list-group-container flex-grow-1"
+                style={{
+                  overflowY: "auto",
+                  marginBottom: "10px",
+                  paddingLeft: "2cm" /* Tambahkan padding kiri sebesar 2cm */,
+                  paddingRight: "2cm" /* Tambahkan padding kanan sebesar 2cm */,
+                }}
               >
-                Pay
-              </button>
+                <ul className="list-group">
+                  {orders.map((order, index) => (
+                    <li
+                      key={index}
+                      className="list-group-item d-flex align-items-center justify-content-between"
+                      style={{ gap: "10px", height: "90px" }}
+                    >
+                      <img
+                        src={order.image}
+                        alt={order.name}
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                          borderRadius: "5px",
+                        }}
+                      />
+                      <div className="flex-grow-1">
+                        <strong>{order.name}</strong>
+                        <div className="d-flex align-items-center gap-2 mt-1">
+                          <button
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => handleDecreaseOrder(order.id)}
+                            disabled={order.quantity <= 1}
+                          >
+                            -
+                          </button>
+                          <span>{order.quantity}</span>
+                          <button
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => handleIncreaseOrder(order.id)}
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <span>{order.price * order.quantity}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Fixed Footer Section */}
+              <div>
+                <div className="mt-3 d-flex justify-content-between">
+                  <strong>Total:</strong>
+                  <strong>{total}</strong>
+                </div>
+
+                <button
+                  className="btn btn-primary w-100 mt-3"
+                  onClick={handleArchiveOrder}
+                >
+                  Pay
+                </button>
+              </div>
             </div>
+            ;
           </div>
         </div>
       </div>
