@@ -7,14 +7,13 @@ const CashierDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [orders, setOrders] = useState([]);
   const [total, setTotal] = useState(0);
-  const [orderType, setOrderType] = useState(""); // State untuk jenis order (Dine In atau Take Away)
+  const [orderType, setOrderType] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
-  const [orderArchive, setOrderArchive] = useState([]); // State untuk menyimpan order yang diarsipkan
-  const [showModal, setShowModal] = useState(false); // State untuk modal
-  const [selectedMenu, setSelectedMenu] = useState(null); // State untuk menu yang dipilih
-  const [note, setNote] = useState(""); // State untuk catatan
+  const [orderArchive, setOrderArchive] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedMenu, setSelectedMenu] = useState(null);
+  const [note, setNote] = useState("");
 
-  // Generate nomor order
   const generateOrderNumber = () => {
     const randomNum = Math.floor(Math.random() * 1000000000);
     return `ORDR#${randomNum}`;
@@ -32,11 +31,39 @@ const CashierDashboard = () => {
     setSearchQuery(e.target.value);
   };
 
-  // Menambahkan menu langsung ke summary order (Dine In)
-  const handleAddToOrder = (menu) => {
-    const newOrder = { ...menu, note: "" }; // Tambahkan menu dengan default note kosong
-    setOrders([...orders, newOrder]);
-    setTotal(total + menu.price); // Tambahkan harga ke total
+  const handleAddOrder = (newOrder) => {
+    const existingOrder = orders.find((order) => order.id === newOrder.id);
+    if (existingOrder) {
+      setOrders(
+        orders.map((order) =>
+          order.id === newOrder.id
+            ? { ...order, quantity: order.quantity + 1 }
+            : order
+        )
+      );
+    } else {
+      setOrders([...orders, { ...newOrder, quantity: 1 }]);
+    }
+  };
+
+  const handleIncreaseOrder = (orderId) => {
+    setOrders(
+      orders.map((order) =>
+        order.id === orderId
+          ? { ...order, quantity: order.quantity + 1 }
+          : order
+      )
+    );
+  };
+
+  const handleDecreaseOrder = (orderId) => {
+    setOrders(
+      orders.map((order) =>
+        order.id === orderId && order.quantity > 1
+          ? { ...order, quantity: order.quantity - 1 }
+          : order
+      )
+    );
   };
 
   const handleOrderTypeChange = (type) => {
@@ -44,44 +71,38 @@ const CashierDashboard = () => {
   };
 
   const handleArchiveOrder = () => {
-    // Menyimpan order yang sedang aktif ke archive
     if (orders.length > 0) {
       setOrderArchive([...orderArchive, { orderNumber, orders, total }]);
-      setOrders([]); // Kosongkan daftar order setelah diarsipkan
-      setTotal(0); // Reset total
+      setOrders([]);
+      setTotal(0);
     }
   };
 
-  // Menangani klik menu
   const handleShowModalOrAddOrder = (menu) => {
     if (!orderType) {
-      // Jika belum memilih Dine In atau Take Away, tampilkan alert
       alert("Please select 'Dine In' or 'Take Away' first!");
-      return; // Hentikan eksekusi jika belum memilih
+      return;
     }
 
     if (orderType === "dineIn") {
-      // Jika Dine In, langsung tambahkan menu ke summary order
-      handleAddToOrder(menu);
+      handleAddOrder(menu);
     } else {
-      // Jika Take Away, tampilkan modal untuk konfirmasi
-      setSelectedMenu(menu); // Simpan menu yang dipilih
-      setShowModal(true); // Tampilkan modal
+      setSelectedMenu(menu);
+      setShowModal(true);
     }
   };
 
   const handleCloseModal = () => {
-    setShowModal(false); // Tutup modal
-    setSelectedMenu(null); // Reset menu yang dipilih
-    setNote(""); // Reset catatan
+    setShowModal(false);
+    setSelectedMenu(null);
+    setNote("");
   };
 
   const handleSubmitToOrder = () => {
-    // Tambahkan menu yang dipilih ke daftar order dengan catatan
     if (selectedMenu) {
-      const menuWithNote = { ...selectedMenu, note }; // Tambahkan catatan ke menu
-      handleAddToOrder(menuWithNote); // Gunakan fungsi handleAddToOrder
-      handleCloseModal(); // Tutup modal setelah submit
+      const menuWithNote = { ...selectedMenu, note };
+      handleAddOrder(menuWithNote);
+      handleCloseModal();
     }
   };
 
@@ -269,7 +290,6 @@ const CashierDashboard = () => {
                 </button>
               </div>
 
-              {/* Form Customer Name dan No Table */}
               <div className="mt-3">
                 <div className="mb-3 w-100">
                   <label
@@ -288,7 +308,6 @@ const CashierDashboard = () => {
                   />
                 </div>
 
-                {/* Tampilkan No Table hanya jika Dine In */}
                 {orderType === "dineIn" && (
                   <div className="d-flex justify-content-between gap-2">
                     <div className="w-100">
@@ -311,7 +330,6 @@ const CashierDashboard = () => {
                 )}
               </div>
 
-              {/* Orders List */}
               <ul className="list-group">
                 {orders.map((order, index) => (
                   <li
@@ -331,8 +349,24 @@ const CashierDashboard = () => {
                     />
                     <div className="flex-grow-1">
                       <strong>{order.name}</strong>
+                      <div className="d-flex align-items-center gap-2 mt-1">
+                        <button
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={() => handleDecreaseOrder(order.id)}
+                          disabled={order.quantity <= 1}
+                        >
+                          -
+                        </button>
+                        <span>{order.quantity}</span>
+                        <button
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={() => handleIncreaseOrder(order.id)}
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
-                    <span>{order.price}</span>
+                    <span>{order.price * order.quantity}</span>
                   </li>
                 ))}
               </ul>
