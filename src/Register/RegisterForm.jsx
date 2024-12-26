@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "/assets/logo.png";
 
 function RegisterForm() {
@@ -8,6 +8,7 @@ function RegisterForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate(); // Used to navigate after successful registration
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,10 +16,14 @@ function RegisterForm() {
       alert("Passwords do not match!");
       return;
     }
-    console.log("Username:", username);
-    console.log("Email:", email);
-    console.log("Password:", password);
-    // Tambahkan logika untuk registrasi di sini
+
+    // Store the registered user data in localStorage
+    const userData = { username, email, password };
+    localStorage.setItem("user", JSON.stringify(userData)); // Save to local storage
+    console.log("User registered:", userData);
+
+    // Redirect to login page after successful registration
+    navigate("/");
   };
 
   return (
@@ -101,9 +106,6 @@ function RegisterForm() {
               Register
             </button>
           </form>
-          {/* <div className="text-center mt-3">
-            <p className="mb-0">Already have an account? <a href="#" className="text-primary text-decoration-none">Login</a></p>
-          </div> */}
           <div className="text-center mt-3">
             <p className="mb-0">
               Already have an account?{" "}

@@ -197,9 +197,8 @@ const CashierDashboard = () => {
               </div>
             </div>
           </nav>
-
-          {/* Kategori menu dan summary order sejajar */}
           <div className="d-flex justify-content-between p-4">
+            {/* Kategori Menu */}
             <div className="d-flex gap-3">
               {[
                 { name: "All Menu" },
@@ -218,6 +217,7 @@ const CashierDashboard = () => {
                     padding: "5px 10px",
                     width: "175px",
                     height: "55px",
+                    marginRight: "15px", // Menambahkan jarak 15px antara menu
                   }}
                   onClick={() => handleButtonClick(category.name)}
                 >
@@ -268,6 +268,7 @@ const CashierDashboard = () => {
                   Take Away
                 </button>
               </div>
+
               {/* Form Customer Name dan No Table */}
               <div className="mt-3">
                 <div className="mb-3 w-100">
@@ -309,6 +310,7 @@ const CashierDashboard = () => {
                   </div>
                 )}
               </div>
+
               {/* Orders List */}
               <ul className="list-group">
                 {orders.map((order, index) => (
@@ -348,7 +350,6 @@ const CashierDashboard = () => {
               </button>
             </div>
           </div>
-
           {/* Menu List */}
           <div className="row g-4 px-4">
             <h2>List Menu</h2>
@@ -399,7 +400,6 @@ const CashierDashboard = () => {
           </div>
         </div>
       </div>
-
       {/* Modal */}
       {showModal && selectedMenu && (
         <div
