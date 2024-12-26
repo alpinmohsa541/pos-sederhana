@@ -218,44 +218,109 @@ const CashierDashboard = () => {
               </div>
             </div>
           </nav>
-          <div className="d-flex justify-content-between p-4">
+          <div className="d-flex justify-content-between p-4 align-items-start">
             {/* Kategori Menu */}
-            <div className="d-flex gap-3">
-              {[
-                { name: "All Menu" },
-                { name: "Food", icon: "/assets/reserve.svg" },
-                { name: "Beverages", icon: "/assets/coffee.svg" },
-                { name: "Dessert", icon: "/assets/cake.svg" },
-              ].map((category) => (
-                <button
-                  key={category.name}
-                  className={`btn d-flex align-items-center justify-content-center ${
-                    activeButton === category.name
-                      ? "btn-primary text-white"
-                      : "btn-outline-primary"
-                  }`}
-                  style={{
-                    padding: "5px 10px",
-                    width: "175px",
-                    height: "55px",
-                    marginRight: "15px", // Menambahkan jarak 15px antara menu
-                  }}
-                  onClick={() => handleButtonClick(category.name)}
-                >
-                  {category.icon && (
-                    <img
-                      src={category.icon}
-                      alt={`${category.name} Icon`}
-                      style={{
-                        width: "20px",
-                        height: "20px",
-                        marginRight: "8px",
-                      }}
-                    />
-                  )}
-                  {category.name}
-                </button>
-              ))}
+            <div className="flex-grow-1 me-4">
+              <div className="d-flex gap-3 mb-4">
+                {[
+                  { name: "All Menu" },
+                  { name: "Food", icon: "/assets/reserve.svg" },
+                  { name: "Beverages", icon: "/assets/coffee.svg" },
+                  { name: "Dessert", icon: "/assets/cake.svg" },
+                ].map((category) => (
+                  <button
+                    key={category.name}
+                    className={`btn d-flex align-items-center justify-content-center ${
+                      activeButton === category.name
+                        ? "btn-primary text-white"
+                        : "btn-outline-primary"
+                    }`}
+                    style={{
+                      padding: "5px 10px",
+                      width: "175px",
+                      height: "55px",
+                      marginRight: "15px", // Menambahkan jarak 15px antara menu
+                    }}
+                    onClick={() => handleButtonClick(category.name)}
+                  >
+                    {category.icon && (
+                      <img
+                        src={category.icon}
+                        alt={`${category.name} Icon`}
+                        style={{
+                          width: "20px",
+                          height: "20px",
+                          marginRight: "8px",
+                        }}
+                      />
+                    )}
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+
+              {/* Menu List */}
+              <div className="row g-4 px-4">
+                <h2>List Menu</h2>
+                <div className="col-md-12">
+                  <div className="row row-cols-1 row-cols-md-4 g-2">
+                    {filteredMenu.map((menu) => (
+                      <div
+                        key={menu.id}
+                        className="col"
+                        onClick={() => handleShowModalOrAddOrder(menu)} // Klik card langsung tambahkan menu atau tampilkan modal
+                        style={{ cursor: "pointer" }}
+                      >
+                        <div className="card h-100" style={{ width: "150px" }}>
+                          <span
+                            className="badge bg-primary"
+                            style={{
+                              fontSize: "0.7rem",
+                              padding: "3px 8px",
+                              borderRadius: "20px",
+                              position: "absolute",
+                              top: "5px",
+                              right: "5px",
+                              zIndex: "10",
+                            }}
+                          >
+                            {menu.category}
+                          </span>
+                          <img
+                            src={menu.image}
+                            className="card-img-top"
+                            alt={menu.name}
+                            style={{ height: "100px", objectFit: "cover" }}
+                          />
+                          <div
+                            className="card-body"
+                            style={{ padding: "10px" }}
+                          >
+                            <h6
+                              className="card-title"
+                              style={{ fontSize: "0.9rem" }}
+                            >
+                              {menu.name}
+                            </h6>
+                            <p
+                              className="card-text text-muted"
+                              style={{ fontSize: "0.8rem" }}
+                            >
+                              {menu.description}
+                            </p>
+                            <p
+                              className="card-text text-primary"
+                              style={{ fontSize: "0.9rem" }}
+                            >
+                              {menu.price} /portion
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Order Summary */}
@@ -382,54 +447,6 @@ const CashierDashboard = () => {
               >
                 Pay
               </button>
-            </div>
-          </div>
-          {/* Menu List */}
-          <div className="row g-4 px-4">
-            <h2>List Menu</h2>
-            <div className="col-md-9">
-              <div className="row g-4">
-                {filteredMenu.map((menu) => (
-                  <div
-                    key={menu.id}
-                    className="col-md-4"
-                    onClick={() => handleShowModalOrAddOrder(menu)} // Klik card langsung tambahkan menu atau tampilkan modal
-                    style={{ cursor: "pointer" }}
-                  >
-                    <div className="card h-100">
-                      <span
-                        className="badge bg-primary"
-                        style={{
-                          fontSize: "0.8rem",
-                          padding: "5px 10px",
-                          borderRadius: "20px",
-                          position: "absolute",
-                          top: "10px",
-                          right: "10px",
-                          zIndex: "10",
-                        }}
-                      >
-                        {menu.category}
-                      </span>
-                      <img
-                        src={menu.image}
-                        className="card-img-top"
-                        alt={menu.name}
-                        style={{ height: "150px", objectFit: "cover" }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title">{menu.name}</h5>
-                        <p className="card-text text-muted">
-                          {menu.description}
-                        </p>
-                        <p className="card-text text-primary">
-                          {menu.price} /portion
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
         </div>
