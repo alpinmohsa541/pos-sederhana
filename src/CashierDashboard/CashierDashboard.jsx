@@ -42,7 +42,10 @@ const CashierDashboard = () => {
         )
       );
     } else {
-      setOrders([...orders, { ...newOrder, quantity: 1 }]);
+      setOrders([
+        ...orders,
+        { ...newOrder, quantity: 1, price: newOrder.price || 0 }, // Pastikan price ada
+      ]);
     }
   };
 
@@ -53,6 +56,11 @@ const CashierDashboard = () => {
           ? { ...order, quantity: order.quantity + 1 }
           : order
       )
+    );
+  };
+  const handleRemoveOrder = (orderId) => {
+    setOrders((prevOrders) =>
+      prevOrders.filter((order) => order.id !== orderId)
     );
   };
 
@@ -105,6 +113,13 @@ const CashierDashboard = () => {
       handleCloseModal();
     }
   };
+
+  const formatPriceToIDR = (price) =>
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0,
+    }).format(price);
 
   const filteredMenu =
     activeButton === "All Menu"
@@ -334,10 +349,15 @@ const CashierDashboard = () => {
                                 {menu.description}
                               </p>
                               <p
-                                className="card-text text-primary"
+                                className="card-text"
                                 style={{ fontSize: "0.9rem" }}
                               >
-                                {menu.price} /portion
+                                <span
+                                  style={{ color: "blue", fontWeight: "bold" }}
+                                >
+                                  {formatPriceToIDR(menu.price)}
+                                </span>{" "}
+                                <span style={{ color: "black" }}>/portion</span>
                               </p>
                             </div>
                           </div>
@@ -431,6 +451,7 @@ const CashierDashboard = () => {
                 style={{
                   overflowY: "auto",
                   marginBottom: "10px",
+                  paddingTop: "5cm",
                   paddingLeft: "2cm", // Tambahkan padding kiri
                   paddingRight: "2cm", // Tambahkan padding kanan
                 }}
@@ -476,7 +497,15 @@ const CashierDashboard = () => {
                             </button>
                           </div>
                         </div>
-                        <span>{order.price * order.quantity}</span>
+                        {/* Tampilkan harga total untuk setiap menu */}
+                        <span>{(order.price * order.quantity).toFixed(2)}</span>
+                        <button
+                          className="btn btn-sm btn-outline-danger position-absolute"
+                          onClick={() => handleRemoveOrder(order.id)}
+                          style={{ top: "5px", right: "5px" }}
+                        >
+                          <i className="bi bi-trash"></i> {/* Icon Trash */}
+                        </button>
                       </li>
                     ))}
                   </ul>
@@ -484,12 +513,21 @@ const CashierDashboard = () => {
               </div>
 
               {/* Fixed Footer Section */}
-              <div>
+              <div style={{ borderTop: "1px solid #ccc", paddingTop: "10px" }}>
+                <div className="mt-3 d-flex justify-content-between">
+                  <strong>Subtotal:</strong>
+                  <strong>{(total * 0.9).toFixed(2)}</strong>{" "}
+                  {/* Anggap Subtotal adalah 90% dari total */}
+                </div>
+                <div className="mt-3 d-flex justify-content-between">
+                  <strong>Tax (10%):</strong>
+                  <strong>{(total * 0.1).toFixed(2)}</strong>{" "}
+                  {/* Tax adalah 10% dari total */}
+                </div>
                 <div className="mt-3 d-flex justify-content-between">
                   <strong>Total:</strong>
-                  <strong>{total}</strong>
+                  <strong>{total.toFixed(2)}</strong>
                 </div>
-
                 <button
                   className="btn btn-primary w-100 mt-3"
                   onClick={handleArchiveOrder}
