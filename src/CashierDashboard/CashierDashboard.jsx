@@ -121,7 +121,7 @@ const CashierDashboard = () => {
     <div className="container-fluid p-0">
       <div className="row g-0">
         {/* Sidebar */}
-        <div className="col-md-1 bg-light vh-100 d-flex flex-column align-items-center p-3">
+        <div className="col-2 col-lg-1 bg-light vh-100 d-flex flex-column align-items-center p-3">
           <div
             className="rounded-circle text-white d-flex justify-content-center align-items-center mb-5"
             style={{
@@ -154,14 +154,15 @@ const CashierDashboard = () => {
               <img
                 src={icon.src}
                 alt={icon.alt}
-                style={{ width: "30px", height: "30px" }}
+                className="img-fluid" // Menggunakan img-fluid agar responsif
+                style={{ maxWidth: "30px", maxHeight: "30px" }}
               />
             </div>
           ))}
         </div>
 
         {/* Main Content */}
-        <div className="col-md-11">
+        <div className="col-10 col-lg-11">
           <nav
             className="navbar navbar-expand-lg navbar-light bg-light px-4"
             style={{ height: "80px" }}
@@ -278,10 +279,11 @@ const CashierDashboard = () => {
                   {/* Container untuk scrollable list */}
                   <div
                     style={{
-                      maxHeight: "800px", // Atur tinggi maksimal sesuai kebutuhan
-                      overflowY: "auto", // Tambahkan scroll jika konten melebihi tinggi maksimal
-                      paddingRight: "10px", // Opsional: untuk jarak dengan scroll bar
+                      maxHeight: "600px", // Sesuaikan untuk layar kecil
+                      overflowY: "auto",
+                      paddingRight: "10px",
                     }}
+                    className="scroll-container"
                   >
                     <div className="row row-cols-1 row-cols-md-4 g-2">
                       {filteredMenu.map((menu) => (
@@ -349,7 +351,7 @@ const CashierDashboard = () => {
             <div
               className="bg-light p-4 d-flex flex-column"
               style={{
-                width: "4800px",
+                width: "3080px",
                 height: "800px",
               }} /* Sesuaikan ukuran yang realistis */
             >
@@ -398,7 +400,6 @@ const CashierDashboard = () => {
                       className="form-control"
                       id="customerName"
                       placeholder="Customer name"
-                      style={{ fontSize: "15px" }}
                     />
                   </div>
 
@@ -426,54 +427,60 @@ const CashierDashboard = () => {
 
               {/* Scrollable List Group */}
               <div
-                className="list-group-container flex-grow-1"
+                className="list-group-container flex-grow-1 d-flex align-items-center justify-content-center"
                 style={{
                   overflowY: "auto",
                   marginBottom: "10px",
-                  paddingLeft: "2cm" /* Tambahkan padding kiri sebesar 2cm */,
-                  paddingRight: "2cm" /* Tambahkan padding kanan sebesar 2cm */,
+                  paddingLeft: "2cm", // Tambahkan padding kiri
+                  paddingRight: "2cm", // Tambahkan padding kanan
                 }}
               >
-                <ul className="list-group">
-                  {orders.map((order, index) => (
-                    <li
-                      key={index}
-                      className="list-group-item d-flex align-items-center justify-content-between"
-                      style={{ gap: "10px", height: "90px" }}
-                    >
-                      <img
-                        src={order.image}
-                        alt={order.name}
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                          borderRadius: "5px",
-                        }}
-                      />
-                      <div className="flex-grow-1">
-                        <strong>{order.name}</strong>
-                        <div className="d-flex align-items-center gap-2 mt-1">
-                          <button
-                            className="btn btn-sm btn-outline-secondary"
-                            onClick={() => handleDecreaseOrder(order.id)}
-                            disabled={order.quantity <= 1}
-                          >
-                            -
-                          </button>
-                          <span>{order.quantity}</span>
-                          <button
-                            className="btn btn-sm btn-outline-secondary"
-                            onClick={() => handleIncreaseOrder(order.id)}
-                          >
-                            +
-                          </button>
+                {orders.length === 0 ? (
+                  <p className="text-muted" style={{ fontSize: "1.2rem" }}>
+                    No Menu Selected
+                  </p>
+                ) : (
+                  <ul className="list-group w-100">
+                    {orders.map((order, index) => (
+                      <li
+                        key={index}
+                        className="list-group-item d-flex align-items-center justify-content-between"
+                        style={{ gap: "10px", height: "90px" }}
+                      >
+                        <img
+                          src={order.image}
+                          alt={order.name}
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            objectFit: "cover",
+                            borderRadius: "5px",
+                          }}
+                        />
+                        <div className="flex-grow-1">
+                          <strong>{order.name}</strong>
+                          <div className="d-flex align-items-center gap-2 mt-1">
+                            <button
+                              className="btn btn-sm btn-outline-secondary"
+                              onClick={() => handleDecreaseOrder(order.id)}
+                              disabled={order.quantity <= 1}
+                            >
+                              -
+                            </button>
+                            <span>{order.quantity}</span>
+                            <button
+                              className="btn btn-sm btn-outline-secondary"
+                              onClick={() => handleIncreaseOrder(order.id)}
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                      <span>{order.price * order.quantity}</span>
-                    </li>
-                  ))}
-                </ul>
+                        <span>{order.price * order.quantity}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
 
               {/* Fixed Footer Section */}
@@ -505,7 +512,7 @@ const CashierDashboard = () => {
           }}
         >
           <div
-            className="modal-dialog"
+            className="modal-dialog "
             style={{ maxWidth: "500px", margin: "10% auto" }}
           >
             <div className="modal-content">
