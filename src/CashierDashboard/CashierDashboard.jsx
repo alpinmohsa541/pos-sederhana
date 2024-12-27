@@ -13,6 +13,14 @@ const CashierDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [note, setNote] = useState("");
+  const [customerName, setCustomerName] = useState(""); // Tambahkan state untuk customerName
+  const [paymentNominal, setPaymentNominal] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [tableNumber, setTableNumber] = useState(""); // State untuk menyimpan nomor meja
+  const [subtotal, setSubtotal] = useState(0);
+  const [tax, setTax] = useState(0);
+  const [receivedAmount, setReceivedAmount] = useState(0);
+  const [changeAmount, setChangeAmount] = useState(0);
 
   const generateOrderNumber = () => {
     const randomNum = Math.floor(Math.random() * 1000000000);
@@ -38,16 +46,32 @@ const CashierDashboard = () => {
     setActiveButton(buttonName);
   };
 
-  const [paymentNominal, setPaymentNominal] = useState(0);
-
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-
   const handlePayment = () => {
     if (paymentNominal >= total) {
-      setShowSuccessModal(true); // Tampilkan modal sukses
-      setOrders([]); // Kosongkan pesanan
-      setPaymentNominal(0); // Reset nominal
-      setTotal(0); // Reset total
+      // Hitung subtotal dan tax
+      const calculatedSubtotal = orders.reduce(
+        (acc, order) => acc + order.price * order.quantity,
+        0
+      );
+      const calculatedTax = calculatedSubtotal * 0.1;
+      const calculatedTotal = calculatedSubtotal + calculatedTax;
+
+      // Hitung kembalian
+      const calculatedChange = paymentNominal - calculatedTotal;
+
+      // Simpan nilai ke state
+      setSubtotal(calculatedSubtotal); // Simpan Subtotal
+      setTax(calculatedTax); // Simpan Tax
+      setReceivedAmount(paymentNominal); // Simpan nilai Diterima
+      setChangeAmount(calculatedChange); // Simpan Kembalian
+
+      // Tampilkan modal sukses
+      setShowSuccessModal(true);
+
+      // Reset state utama
+      setOrders([]);
+      setPaymentNominal(0);
+      setTotal(0);
     } else {
       alert("Insufficient payment!");
     }
@@ -447,7 +471,9 @@ const CashierDashboard = () => {
                       type="text"
                       className="form-control"
                       id="customerName"
+                      value={customerName}
                       placeholder="Customer name"
+                      onChange={(e) => setCustomerName(e.target.value)} // Update state
                     />
                   </div>
 
@@ -461,7 +487,12 @@ const CashierDashboard = () => {
                       >
                         No. Table
                       </label>
-                      <select className="form-select" id="tableNumber">
+                      <select
+                        className="form-select"
+                        value={tableNumber}
+                        onChange={(e) => setTableNumber(e.target.value)} // Update state
+                        id="tableNumber"
+                      >
                         {[...Array(20)].map((_, index) => (
                           <option key={index} value={index + 1}>
                             Table {index + 1}
@@ -648,6 +679,7 @@ const CashierDashboard = () => {
           </div>
         </div>
       </div>
+      {/* Modal Success Payment */}
       {showSuccessModal && (
         <div
           className="modal"
@@ -704,7 +736,7 @@ const CashierDashboard = () => {
                 </p>
                 {orderType === "dineIn" && (
                   <p>
-                    <strong>Table:</strong> No. Meja 02
+                    <strong>Table:</strong> {tableNumber}
                   </p>
                 )}
 
@@ -727,28 +759,28 @@ const CashierDashboard = () => {
                 {/* Subtotal, Tax, dan Total */}
                 <div className="d-flex justify-content-between">
                   <strong>Sub Total:</strong>
-                  <span>{formatPriceToIDR(total * 0.9)}</span>
+                  <span>{formatPriceToIDR(subtotal)}</span>
                 </div>
                 <div className="d-flex justify-content-between">
                   <strong>Tax:</strong>
-                  <span>{formatPriceToIDR(total * 0.1)}</span>
+                  <span>{formatPriceToIDR(tax)}</span>
                 </div>
                 <hr />
                 <div className="d-flex justify-content-between">
                   <strong>Total:</strong>
                   <strong style={{ fontSize: "1.2rem" }}>
-                    {formatPriceToIDR(total)}
+                    {formatPriceToIDR(subtotal + tax)}
                   </strong>
                 </div>
 
                 {/* Diterima dan Kembalian */}
                 <div className="d-flex justify-content-between mt-3">
                   <strong>Diterima:</strong>
-                  <span>{formatPriceToIDR(paymentNominal)}</span>
+                  <span>{formatPriceToIDR(receivedAmount)}</span>
                 </div>
                 <div className="d-flex justify-content-between">
                   <strong>Kembalian:</strong>
-                  <span>{formatPriceToIDR(paymentNominal - total)}</span>
+                  <span>{formatPriceToIDR(changeAmount)}</span>
                 </div>
               </div>
               <div className="modal-footer">
