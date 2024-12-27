@@ -275,61 +275,73 @@ const CashierDashboard = () => {
                   Total: {filteredMenu.length} Menu
                 </div>
                 <div className="col-md-12">
-                  <div className="row row-cols-1 row-cols-md-4 g-2">
-                    {filteredMenu.map((menu) => (
-                      <div
-                        key={menu.id}
-                        className="col"
-                        onClick={() => handleShowModalOrAddOrder(menu)} // Klik card langsung tambahkan menu atau tampilkan modal
-                        style={{ cursor: "pointer" }}
-                      >
-                        <div className="card h-100" style={{ width: "150px" }}>
-                          <span
-                            className="badge bg-primary"
-                            style={{
-                              fontSize: "0.7rem",
-                              padding: "3px 8px",
-                              borderRadius: "20px",
-                              position: "absolute",
-                              top: "5px",
-                              right: "5px",
-                              zIndex: "10",
-                            }}
-                          >
-                            {menu.category}
-                          </span>
-                          <img
-                            src={menu.image}
-                            className="card-img-top"
-                            alt={menu.name}
-                            style={{ height: "100px", objectFit: "cover" }}
-                          />
+                  {/* Container untuk scrollable list */}
+                  <div
+                    style={{
+                      maxHeight: "800px", // Atur tinggi maksimal sesuai kebutuhan
+                      overflowY: "auto", // Tambahkan scroll jika konten melebihi tinggi maksimal
+                      paddingRight: "10px", // Opsional: untuk jarak dengan scroll bar
+                    }}
+                  >
+                    <div className="row row-cols-1 row-cols-md-4 g-2">
+                      {filteredMenu.map((menu) => (
+                        <div
+                          key={menu.id}
+                          className="col"
+                          onClick={() => handleShowModalOrAddOrder(menu)} // Klik card langsung tambahkan menu atau tampilkan modal
+                          style={{ cursor: "pointer" }}
+                        >
                           <div
-                            className="card-body"
-                            style={{ padding: "10px" }}
+                            className="card h-100"
+                            style={{ width: "150px" }}
                           >
-                            <h6
-                              className="card-title"
-                              style={{ fontSize: "0.9rem" }}
+                            <span
+                              className="badge bg-primary"
+                              style={{
+                                fontSize: "0.7rem",
+                                padding: "3px 8px",
+                                borderRadius: "20px",
+                                position: "absolute",
+                                top: "5px",
+                                right: "5px",
+                                zIndex: "10",
+                              }}
                             >
-                              {menu.name}
-                            </h6>
-                            <p
-                              className="card-text text-muted"
-                              style={{ fontSize: "0.8rem" }}
+                              {menu.category}
+                            </span>
+                            <img
+                              src={menu.image}
+                              className="card-img-top"
+                              alt={menu.name}
+                              style={{ height: "100px", objectFit: "cover" }}
+                            />
+                            <div
+                              className="card-body"
+                              style={{ padding: "10px" }}
                             >
-                              {menu.description}
-                            </p>
-                            <p
-                              className="card-text text-primary"
-                              style={{ fontSize: "0.9rem" }}
-                            >
-                              {menu.price} /portion
-                            </p>
+                              <h6
+                                className="card-title"
+                                style={{ fontSize: "0.9rem" }}
+                              >
+                                {menu.name}
+                              </h6>
+                              <p
+                                className="card-text text-muted"
+                                style={{ fontSize: "0.8rem" }}
+                              >
+                                {menu.description}
+                              </p>
+                              <p
+                                className="card-text text-primary"
+                                style={{ fontSize: "0.9rem" }}
+                              >
+                                {menu.price} /portion
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -479,7 +491,6 @@ const CashierDashboard = () => {
                 </button>
               </div>
             </div>
-            ;
           </div>
         </div>
       </div>
