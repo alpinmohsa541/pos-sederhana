@@ -23,8 +23,34 @@ const CashierDashboard = () => {
     setOrderNumber(generateOrderNumber());
   }, [orders]);
 
+  useEffect(() => {
+    const subtotal = orders.reduce(
+      (acc, order) => acc + order.price * order.quantity,
+      0
+    );
+    const tax = subtotal * 0.1; // 10% tax
+    const totalAmount = subtotal + tax;
+
+    setTotal(totalAmount); // Set total ke state
+  }, [orders]);
+
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
+  };
+
+  const [paymentNominal, setPaymentNominal] = useState(0);
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const handlePayment = () => {
+    if (paymentNominal >= total) {
+      setShowSuccessModal(true); // Tampilkan modal sukses
+      setOrders([]); // Kosongkan pesanan
+      setPaymentNominal(0); // Reset nominal
+      setTotal(0); // Reset total
+    } else {
+      alert("Insufficient payment!");
+    }
   };
 
   const handleSearchChange = (e) => {
@@ -373,6 +399,8 @@ const CashierDashboard = () => {
               style={{
                 width: "3080px",
                 height: "800px",
+                borderRadius: "15px", // Tambahkan border-radius untuk sudut melengkung
+                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
               }} /* Sesuaikan ukuran yang realistis */
             >
               <h3>List Order</h3>
@@ -461,16 +489,24 @@ const CashierDashboard = () => {
                     No Menu Selected
                   </p>
                 ) : (
-                  <ul className="list-group w-100">
+                  <ul className="list-group">
                     {orders.map((order, index) => (
                       <li
                         key={index}
                         className="list-group-item d-flex align-items-center justify-content-between"
-                        style={{ gap: "10px", height: "90px" }}
+                        style={{
+                          gap: "15px", // Jarak antar-elemen dalam container
+                          height: "110px", // Tinggi card lebih besar
+                          padding: "15px", // Tambahkan padding dalam card
+                          fontSize: "10px", // Ukuran teks lebih besar
+                          borderRadius: "10px", // Tambahkan border-radius untuk tampilan lebih halus
+                          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Tambahkan bayangan
+                          backgroundColor: "#f9f9f9", // Warna latar belakang
+                        }}
                       >
                         <img
                           src={order.image}
-                          alt={order.name}
+                          alt={order}
                           style={{
                             width: "50px",
                             height: "50px",
@@ -497,8 +533,10 @@ const CashierDashboard = () => {
                             </button>
                           </div>
                         </div>
-                        {/* Tampilkan harga total untuk setiap menu */}
-                        <span>{(order.price * order.quantity).toFixed(2)}</span>
+                        {/* Tampilkan harga total dengan format Rupiah */}
+                        <span style={{ color: "blue", fontWeight: "bold" }}>
+                          {formatPriceToIDR(order.price * order.quantity)}
+                        </span>
                         <button
                           className="btn btn-sm btn-outline-danger position-absolute"
                           onClick={() => handleRemoveOrder(order.id)}
@@ -515,30 +553,219 @@ const CashierDashboard = () => {
               {/* Fixed Footer Section */}
               <div style={{ borderTop: "1px solid #ccc", paddingTop: "10px" }}>
                 <div className="mt-3 d-flex justify-content-between">
-                  <strong>Subtotal:</strong>
-                  <strong>{(total * 0.9).toFixed(2)}</strong>{" "}
-                  {/* Anggap Subtotal adalah 90% dari total */}
+                  <strong style={{ color: "#5E5E5E" }}>Subtotal:</strong>
+                  <strong style={{ color: "#5E5E5E" }}>
+                    {formatPriceToIDR(
+                      orders.reduce(
+                        (acc, order) => acc + order.price * order.quantity,
+                        0
+                      )
+                    )}
+                  </strong>
                 </div>
                 <div className="mt-3 d-flex justify-content-between">
-                  <strong>Tax (10%):</strong>
-                  <strong>{(total * 0.1).toFixed(2)}</strong>{" "}
-                  {/* Tax adalah 10% dari total */}
+                  <strong style={{ color: "#5E5E5E" }}>Tax (10%):</strong>
+                  <strong style={{ color: "#5E5E5E" }}>
+                    {formatPriceToIDR(
+                      orders.reduce(
+                        (acc, order) => acc + order.price * order.quantity,
+                        0
+                      ) * 0.1
+                    )}
+                  </strong>
                 </div>
+
+                {/* Garis pembatas antara Tax dan Total */}
+                <hr style={{ border: "1px solid #ccc", margin: "15px 0" }} />
+
                 <div className="mt-3 d-flex justify-content-between">
                   <strong>Total:</strong>
-                  <strong>{total.toFixed(2)}</strong>
+                  <strong style={{ color: "black" }}>
+                    {formatPriceToIDR(total)}
+                  </strong>
                 </div>
-                <button
-                  className="btn btn-primary w-100 mt-3"
-                  onClick={handleArchiveOrder}
-                >
-                  Pay
-                </button>
+
+                {/* Tampilkan form nominal hanya jika ada pesanan */}
+                {orders.length > 0 && (
+                  <>
+                    {/* Tombol Select Nominal */}
+                    <div
+                      className="mt-3 d-flex gap-2"
+                      style={{ justifyContent: "center" }}
+                    >
+                      <button
+                        className="btn btn-outline-secondary"
+                        onClick={() => setPaymentNominal(50000)}
+                      >
+                        50.000
+                      </button>
+                      <button
+                        className="btn btn-outline-secondary"
+                        onClick={() => setPaymentNominal(75000)}
+                      >
+                        75.000
+                      </button>
+                      <button
+                        className="btn btn-outline-secondary"
+                        onClick={() => setPaymentNominal(100000)}
+                      >
+                        100.000
+                      </button>
+                    </div>
+
+                    {/* Form Input Nominal */}
+                    <div className="mt-4">
+                      <label
+                        htmlFor="paymentInput"
+                        style={{ fontSize: "14px", fontWeight: "bold" }}
+                      >
+                        Enter Nominal Here:
+                      </label>
+                      <input
+                        type="number"
+                        id="paymentInput"
+                        className="form-control mt-2"
+                        placeholder="Enter nominal here..."
+                        value={paymentNominal}
+                        onChange={(e) =>
+                          setPaymentNominal(Number(e.target.value))
+                        }
+                      />
+                    </div>
+
+                    {/* Tombol Pay */}
+                    <button
+                      className="btn btn-primary w-100 mt-4"
+                      onClick={handlePayment}
+                      disabled={paymentNominal < total} // Nonaktifkan jika nominal kurang dari total
+                    >
+                      Pay
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </div>
       </div>
+      {showSuccessModal && (
+        <div
+          className="modal"
+          style={{
+            display: "block",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          <div
+            className="modal-dialog"
+            style={{
+              maxWidth: "410px",
+              borderRadius: "10px",
+              margin: "10% auto",
+              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+              overflow: "hidden",
+            }}
+          >
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Transaction Success</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  style={{
+                    background: "none",
+                    border: "none",
+                    fontSize: "1.5rem",
+                    position: "absolute",
+                    top: "10px",
+                    right: "10px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setShowSuccessModal(false)}
+                >
+                  &times;
+                </button>
+              </div>
+              <div className="modal-body">
+                {/* Informasi Utama */}
+                <p>
+                  <strong>No Order:</strong> {orderNumber}
+                </p>
+                <p>
+                  <strong>Order Date:</strong>{" "}
+                  {new Date().toLocaleString("id-ID")}
+                </p>
+                <p>
+                  <strong>Customer Name:</strong> {customerName}
+                </p>
+                <p>
+                  <strong>Order Type:</strong>{" "}
+                  {orderType === "dineIn" ? "Dine-in" : "Take-away"}
+                </p>
+                {orderType === "dineIn" && (
+                  <p>
+                    <strong>Table:</strong> No. Meja 02
+                  </p>
+                )}
+
+                <hr />
+
+                {/* Daftar Pesanan */}
+                {orders.map((order, index) => (
+                  <div key={index} className="d-flex justify-content-between">
+                    <span>
+                      {order.quantity} x {order.name}
+                    </span>
+                    <span>
+                      {formatPriceToIDR(order.price * order.quantity)}
+                    </span>
+                  </div>
+                ))}
+
+                <hr />
+
+                {/* Subtotal, Tax, dan Total */}
+                <div className="d-flex justify-content-between">
+                  <strong>Sub Total:</strong>
+                  <span>{formatPriceToIDR(total * 0.9)}</span>
+                </div>
+                <div className="d-flex justify-content-between">
+                  <strong>Tax:</strong>
+                  <span>{formatPriceToIDR(total * 0.1)}</span>
+                </div>
+                <hr />
+                <div className="d-flex justify-content-between">
+                  <strong>Total:</strong>
+                  <strong style={{ fontSize: "1.2rem" }}>
+                    {formatPriceToIDR(total)}
+                  </strong>
+                </div>
+
+                {/* Diterima dan Kembalian */}
+                <div className="d-flex justify-content-between mt-3">
+                  <strong>Diterima:</strong>
+                  <span>{formatPriceToIDR(paymentNominal)}</span>
+                </div>
+                <div className="d-flex justify-content-between">
+                  <strong>Kembalian:</strong>
+                  <span>{formatPriceToIDR(paymentNominal - total)}</span>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="btn btn-primary w-100"
+                  onClick={() => {
+                    setShowSuccessModal(false);
+                    alert("Printing receipt...");
+                  }}
+                >
+                  Print Struk
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && selectedMenu && (
