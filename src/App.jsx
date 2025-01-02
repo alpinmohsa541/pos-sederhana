@@ -5,6 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Reset from "./ResetPassword/EmailForm";
 import ResetPassword from "./ResetPassword/ResetPasswordForm";
 import CashierDashboard from "./CashierDashboard/CashierDashboard";
+import SalesReport from "./SalesReport/SalesReport";
 
 function App() {
   return (
@@ -24,6 +25,9 @@ function App() {
 
         {/* Route untuk halaman reset password */}
         <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Route untuk halaman Sales Report */}
+        <Route path="/sales-report" element={<SalesReport />} />
       </Routes>
     </Router>
   );

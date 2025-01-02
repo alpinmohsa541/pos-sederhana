@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Tambahkan ini
 import menuData from "./DataMenu";
 import Navbar from "../Navbar/Navbar"; // Import komponen Navbar
+import Sidebar from "../Sidebar/Sidebar"; // Sesuaikan path dengan struktur folder
 
 const CashierDashboard = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -150,14 +151,6 @@ const CashierDashboard = () => {
     setOrderType(type);
   };
 
-  // const handleArchiveOrder = () => {
-  //   if (orders.length > 0) {
-  //     setOrderArchive([...orderArchive, { orderNumber, orders, total }]);
-  //     setOrders([]);
-  //     setTotal(0);
-  //   }
-  // };
-
   const handleShowModalOrAddOrder = (menu) => {
     if (!orderType) {
       alert("Please select 'Dine In' or 'Take Away' first!");
@@ -208,45 +201,7 @@ const CashierDashboard = () => {
     <div className="container-fluid p-0">
       <div className="row g-0">
         {/* Sidebar */}
-        <div className="col-2 col-lg-1 bg-light vh-100 d-flex flex-column align-items-center p-3">
-          <div
-            className="rounded-circle text-white d-flex justify-content-center align-items-center mb-5"
-            style={{
-              width: "60px",
-              height: "60px",
-              fontSize: "2rem",
-              background: "linear-gradient(135deg, #3572EF, #4C3BCF)",
-            }}
-          >
-            P
-          </div>
-
-          <div className="arrow-right-icon mb-5">
-            <i
-              className="bi bi-arrow-right-circle"
-              style={{ fontSize: "1.5rem", color: "#6392F3" }}
-            ></i>
-          </div>
-
-          {[
-            { src: "/assets/shop.svg", alt: "Shop Icon", title: "Shop" },
-            {
-              src: "/assets/clipboard-text.svg",
-              alt: "Clipboard",
-              title: "Clipboard",
-            },
-            { src: "/assets/setting-2.svg", alt: "Setting", title: "Setting" },
-          ].map((icon, index) => (
-            <div key={index} className="mb-5" title={icon.title}>
-              <img
-                src={icon.src}
-                alt={icon.alt}
-                className="img-fluid" // Menggunakan img-fluid agar responsif
-                style={{ maxWidth: "30px", maxHeight: "30px" }}
-              />
-            </div>
-          ))}
-        </div>
+        <Sidebar />
 
         {/* Main Content */}
         <div className="col-10 col-lg-11">
