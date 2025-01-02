@@ -1,15 +1,20 @@
 import "../App.css";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Tambahkan ini
 import menuData from "./DataMenu";
+import Navbar from "../Navbar/Navbar"; // Import komponen Navbar
 
 const CashierDashboard = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
   const [activeButton, setActiveButton] = useState("All Menu");
   const [searchQuery, setSearchQuery] = useState("");
   const [orders, setOrders] = useState([]);
   const [total, setTotal] = useState(0);
   const [orderType, setOrderType] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
-  const [orderArchive, setOrderArchive] = useState([]);
+  // const [orderArchive, setOrderArchive] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [note, setNote] = useState("");
@@ -22,6 +27,23 @@ const CashierDashboard = () => {
   const [receivedAmount, setReceivedAmount] = useState(0);
   const [changeAmount, setChangeAmount] = useState(0);
 
+  useEffect(() => {
+    // Ambil data pengguna dari localStorage
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setUsername(storedUser);
+      setIsLoggedIn(true);
+    } else {
+      navigate("/"); // Redirect ke login jika belum login
+    }
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("user"); // Hapus data pengguna
+    setIsLoggedIn(false);
+    setUsername(null);
+    navigate("/"); // Redirect ke halaman login
+  };
   const generateOrderNumber = () => {
     const randomNum = Math.floor(Math.random() * 1000000000);
     return `ORDR#${randomNum}`;
@@ -128,13 +150,13 @@ const CashierDashboard = () => {
     setOrderType(type);
   };
 
-  const handleArchiveOrder = () => {
-    if (orders.length > 0) {
-      setOrderArchive([...orderArchive, { orderNumber, orders, total }]);
-      setOrders([]);
-      setTotal(0);
-    }
-  };
+  // const handleArchiveOrder = () => {
+  //   if (orders.length > 0) {
+  //     setOrderArchive([...orderArchive, { orderNumber, orders, total }]);
+  //     setOrders([]);
+  //     setTotal(0);
+  //   }
+  // };
 
   const handleShowModalOrAddOrder = (menu) => {
     if (!orderType) {
@@ -228,62 +250,14 @@ const CashierDashboard = () => {
 
         {/* Main Content */}
         <div className="col-10 col-lg-11">
-          <nav
-            className="navbar navbar-expand-lg navbar-light bg-light px-4"
-            style={{ height: "80px" }}
-          >
-            <div className="container-fluid">
-              {/* Search bar */}
-              <form className="d-flex me-auto" style={{ width: "450px" }}>
-                <div className="input-group">
-                  <span className="input-group-text bg-white border-end-0">
-                    <i
-                      className="bi bi-search"
-                      style={{ fontSize: "1.2rem", color: "#6392F3" }}
-                    ></i>
-                  </span>
-                  <input
-                    className="form-control border-start-0"
-                    type="search"
-                    placeholder="Enter the keyword here..."
-                    aria-label="Search"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                  />
-                </div>
-              </form>
-              <div className="d-flex align-items-center me-4">
-                <img
-                  src="/assets/archive-add.svg"
-                  alt="Order Archive Icon"
-                  style={{ width: "20px", height: "20px", marginRight: "8px" }}
-                />
-                <span style={{ padding: "10px" }}>Order Archive</span>
-              </div>
-              <div className="d-flex align-items-center">
-                <img
-                  src="/assets/profile.svg"
-                  className="profile me-2"
-                  alt="Profile Icon"
-                  style={{ fontSize: "60px", padding: "5px", color: "#6392F3" }}
-                />
-                <div className="d-flex flex-column">
-                  <span className="me-3" style={{ fontSize: "1.2rem" }}>
-                    John Doe
-                  </span>
-                  <small style={{ fontSize: "0.9rem", color: "#6c757d" }}>
-                    Cashier
-                  </small>
-                </div>
-                <img
-                  src="/assets/logout.svg"
-                  alt="Logout Icon"
-                  className="ms-3"
-                  style={{ width: "24px" }}
-                />
-              </div>
-            </div>
-          </nav>
+          <Navbar
+            isLoggedIn={isLoggedIn}
+            username={username}
+            searchQuery={searchQuery}
+            handleSearchChange={handleSearchChange}
+            handleLogout={handleLogout}
+          />
+
           <div className="d-flex justify-content-between p-4 align-items-start">
             {/* Kategori Menu */}
             <div className="flex-grow-1 me-4">
