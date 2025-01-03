@@ -6,6 +6,7 @@ import Reset from "./ResetPassword/EmailForm";
 import ResetPassword from "./ResetPassword/ResetPasswordForm";
 import CashierDashboard from "./CashierDashboard/CashierDashboard";
 import SalesReport from "./SalesReport/SalesReport";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 function App() {
   return (

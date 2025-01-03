@@ -5,6 +5,25 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Tambahkan ini
 
 const SalesReport = () => {
+  const exportAsPDF = () => {
+    // Gunakan library seperti jsPDF untuk mengekspor data ke PDF
+    import("jspdf").then((jsPDF) => {
+      const doc = new jsPDF();
+      doc.text("Sales Report", 10, 10);
+      doc.save("sales_report.pdf");
+    });
+  };
+
+  const exportAsExcel = () => {
+    // Gunakan library seperti SheetJS (xlsx) untuk mengekspor data ke Excel
+    import("xlsx").then((XLSX) => {
+      const ws = XLSX.utils.json_to_sheet(orders);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Sales Report");
+      XLSX.writeFile(wb, "sales_report.xlsx");
+    });
+  };
+
   const [orders, setOrders] = useState([]);
   const [filters, setFilters] = useState({
     startDate: "",
@@ -347,13 +366,40 @@ const SalesReport = () => {
                   }}
                 ></i>
               </div>
-              <div className="col">
-                <button className="btn btn-primary w-100">Search</button>
-              </div>
-              <div className="col">
-                <button className="btn btn-outline-secondary w-100">
-                  <i className="bi bi-download"></i>
-                </button>
+              <div className="col d-flex justify-content-between align-items-end">
+                <button className="btn btn-primary w-50 me-2">Search</button>
+                <div className="dropdown w-50">
+                  <button
+                    className="btn btn-outline-secondary dropdown-toggle w-100"
+                    type="button"
+                    id="dropdownMenuButton"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <i className="bi bi-download"></i> Download
+                  </button>
+                  <ul
+                    className="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton"
+                  >
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => exportAsPDF()}
+                      >
+                        Export as PDF
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => exportAsExcel()}
+                      >
+                        Export as Excel
+                      </button>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
 
