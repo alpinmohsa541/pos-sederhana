@@ -3,8 +3,49 @@ import Sidebar from "../Sidebar/Sidebar";
 import "../App.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Tambahkan ini
+import FoodsModal from "./FoodsModal";
+import TransactionDetailModal from "./TransactionDetailModal";
 
 const SalesReport = () => {
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [isFoodsModalOpen, setIsFoodsModalOpen] = useState(false);
+
+  const handleRowClick = (order) => {
+    setSelectedTransaction(order);
+    setIsModalOpen(true);
+  };
+  // Fungsi untuk menutup semua modal
+  const closeAllModals = () => {
+    setIsTransactionModalOpen(false);
+    setIsFoodsModalOpen(false);
+  };
+
+  // Fungsi untuk membuka TransactionDetailModal
+  const handleTransactionModalOpen = (order) => {
+    closeAllModals(); // Pastikan modal lain tertutup
+    setSelectedTransaction(order);
+    setIsTransactionModalOpen(true);
+  };
+
+  // Fungsi untuk membuka FoodsModal
+  const handleFoodsModalOpen = () => {
+    closeAllModals(); // Pastikan modal lain tertutup
+    setIsFoodsModalOpen(true);
+  };
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const foodsData = [
+    { menuName: "Gado-gado Spesial", totalSales: 10 },
+    { menuName: "Ketoprak", totalSales: 5 },
+    { menuName: "Siomay", totalSales: 3 },
+    { menuName: "Batagor", totalSales: 2 },
+    { menuName: "Bakso", totalSales: 2 },
+    { menuName: "Mie Ayam", totalSales: 2 },
+    { menuName: "Soto Ayam", totalSales: 1 },
+    { menuName: "Soto Sapi", totalSales: 0 },
+  ];
   const exportAsPDF = () => {
     // Gunakan library seperti jsPDF untuk mengekspor data ke PDF
     import("jspdf").then((jsPDF) => {
@@ -199,6 +240,12 @@ const SalesReport = () => {
           />
 
           <div className="container-fluid mt-4">
+            {/* Label Sales Report */}
+            <div className="row mb-4">
+              <div className="col">
+                <h2 className="text">Sales Report</h2>
+              </div>
+            </div>
             {/* Dashboard Summary */}
             <div className="row mb-4">
               <div className="col">
@@ -418,14 +465,35 @@ const SalesReport = () => {
                 </thead>
                 <tbody>
                   {currentItems.map((order) => (
-                    <tr key={order.id}>
+                    <tr
+                      key={order.id}
+                      onClick={() => handleTransactionModalOpen(order)}
+                      style={{ cursor: "pointer" }}
+                    >
                       <td>{order.noOrder}</td>
                       <td>{order.orderDate}</td>
                       <td>{order.orderType}</td>
                       <td>{order.category}</td>
                       <td>{order.customerName}</td>
                       <td>
-                        <button className="btn btn-link">View</button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent row click
+                            handleFoodsModalOpen();
+                          }}
+                          style={{
+                            background: "none",
+                            border: "none",
+                            cursor: "pointer",
+                            padding: 0,
+                          }}
+                        >
+                          <img
+                            src="/assets/export.svg"
+                            alt="Show Foods Modal"
+                            style={{ width: "32px", height: "32px" }}
+                          />
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -490,6 +558,18 @@ const SalesReport = () => {
           </div>
         </div>
       </div>
+      {/* Modals */}
+      <TransactionDetailModal
+        isOpen={isTransactionModalOpen}
+        onClose={closeAllModals}
+        transaction={selectedTransaction}
+      />
+
+      <FoodsModal
+        isOpen={isFoodsModalOpen}
+        onClose={closeAllModals}
+        foodsData={foodsData}
+      />
     </div>
   );
 };

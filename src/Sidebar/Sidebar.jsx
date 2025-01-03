@@ -26,9 +26,6 @@ const Sidebar = () => {
     },
   ];
 
-  // Mengecek apakah path saat ini adalah CashierDashboard
-  const isCashierDashboard = location.pathname === "/cashier-dashboard";
-
   // Fungsi untuk menangani klik dan melakukan navigasi
   const handleIconClick = (path) => {
     navigate(path); // Melakukan navigasi ke path yang diklik
@@ -60,9 +57,19 @@ const Sidebar = () => {
         <div
           key={index}
           className={`icon-item mb-4 ${
-            isCashierDashboard && icon.title === "Shop" ? "hover-effect" : ""
-          }`}
+            location.pathname === icon.path ? "active-icon" : ""
+          }`} // Menambahkan class active-icon pada ikon yang aktif
           title={icon.title}
+          style={{
+            width: "50px",
+            height: "50px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            border:
+              location.pathname === icon.path ? "2px solid #3572EF" : "none", // Border biru untuk ikon aktif
+            borderRadius: "10px",
+          }}
         >
           <button
             onClick={() => handleIconClick(icon.path)} // Menambahkan event onClick untuk navigasi
@@ -73,7 +80,12 @@ const Sidebar = () => {
               src={icon.src}
               alt={icon.alt}
               className="img-fluid"
-              style={{ maxWidth: "30px", maxHeight: "30px" }}
+              style={{
+                maxWidth: "30px",
+                maxHeight: "30px",
+                filter:
+                  location.pathname === icon.path ? "none" : "grayscale(100%)", // Mengubah warna ikon menjadi grayscale jika tidak aktif
+              }}
               aria-label={icon.title}
             />
           </button>
