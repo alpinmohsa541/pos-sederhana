@@ -1,4 +1,38 @@
-import { useLocation, useNavigate } from "react-router-dom"; // Import useNavigate untuk navigasi
+import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom"; // Import useNavigate dan useLocation
+import Sidebar from "../Sidebar/Sidebar";
+import Navbar from "../Navbar/Navbar";
+
+const Profile = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("user"); // Hapus data pengguna
+    setIsLoggedIn(false);
+    setUsername(null);
+    navigate("/"); // Redirect ke halaman login
+  };
+
+  return (
+    <div className="container-fluid p-0">
+      <div className="row g-0">
+        {/* Sidebar */}
+        <Sidebar />
+
+        {/* Main Content */}
+        <div className="col-10 col-lg-11">
+          <Navbar
+            isLoggedIn={isLoggedIn}
+            username={username}
+            handleLogout={handleLogout}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Sidebar = () => {
   const location = useLocation(); // Mengambil lokasi halaman saat ini
@@ -22,7 +56,7 @@ const Sidebar = () => {
       src: "/assets/setting-2.svg",
       alt: "Setting",
       title: "Setting",
-      path: "/settings",
+      path: "/profile",
     },
   ];
 
@@ -95,4 +129,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default Profile;

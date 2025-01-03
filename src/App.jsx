@@ -29,6 +29,8 @@ function App() {
 
         {/* Route untuk halaman Sales Report */}
         <Route path="/sales-report" element={<SalesReport />} />
+        {/* Route untuk halaman Profile*/}
+        <Route path="/sales-report" element={<SalesReport />} />
       </Routes>
     </Router>
   );
