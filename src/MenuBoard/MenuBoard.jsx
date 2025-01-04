@@ -1,62 +1,44 @@
 import "../App.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import menuData from "../CashierDashboard/DataMenu"; // Simulasi data menu
-import Navbar from "../Navbar/Navbar"; // Import Navbar
-import Sidebar from "../Sidebar/Sidebar"; // Import Sidebar
+import { getMenuData, updateMenuData } from "../CashierDashboard/DataMenu"; // Update DataMenu import
+import Navbar from "../Navbar/Navbar";
+import Sidebar from "../Sidebar/Sidebar";
 import AddMenuCard from "./AddMenuCard";
-
-const AddMenu = ({ menus, setMenus }) => {
-  const [newMenu, setNewMenu] = useState("");
-
-  const handleAddMenu = () => {
-    if (newMenu.trim()) {
-      // Tambahkan menu baru ke dalam list menu
-      const newMenuItem = {
-        name: newMenu.trim(),
-        category: "Custom",
-        description: "New custom menu",
-        price: 0,
-        image: "/assets/default-image.jpg", // Placeholder image
-      };
-      setMenus([...menus, newMenuItem]);
-      setNewMenu("");
-    }
-  };
-};
+import DetailMenuModal from "./DetailMenuModal";
 
 const MenuBoard = () => {
+  const [selectedMenu, setSelectedMenu] = useState(null);
+  const [menu, setMenu] = useState(getMenuData()); // Ambil data dari DataMenu
+  const [filteredMenu, setFilteredMenu] = useState(getMenuData());
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
-  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("All Menu");
   const [searchQuery, setSearchQuery] = useState("");
-  const [menu, setMenu] = useState(menuData); // Data menu
-  const [filteredMenu, setFilteredMenu] = useState(menuData); // Data menu setelah filter
+  const [notification, setNotification] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Ambil data pengguna dari localStorage
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUsername(storedUser);
       setIsLoggedIn(true);
     } else {
-      navigate("/"); // Redirect ke login jika belum login
+      navigate("/");
     }
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("user"); // Hapus data pengguna
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
     setUsername(null);
-    navigate("/"); // Redirect ke login
+    navigate("/");
   };
 
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
 
-    // Filter menu berdasarkan pencarian dan kategori aktif
     const filtered = menu.filter(
       (item) =>
         item.name.toLowerCase().includes(query) &&
@@ -68,7 +50,6 @@ const MenuBoard = () => {
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
 
-    // Filter menu berdasarkan kategori
     const filtered = menu.filter(
       (item) =>
         (category === "All Menu" ||
@@ -79,19 +60,34 @@ const MenuBoard = () => {
   };
 
   useEffect(() => {
-    // Filter ulang saat kategori aktif atau pencarian berubah
     handleCategoryClick(activeCategory);
-  }, [activeCategory, searchQuery]);
+  }, [activeCategory, searchQuery, menu]);
+
+  const handleSaveMenu = (updatedMenu) => {
+    // Update state menu
+    setMenu((prevMenus) =>
+      prevMenus.map((menu) => (menu.id === updatedMenu.id ? updatedMenu : menu))
+    );
+
+    // Update data di DataMenu.jsx
+    updateMenuData(updatedMenu);
+
+    setNotification("Menu successfully updated!");
+    setTimeout(() => setNotification(""), 3000);
+  };
+
+  const handleDeleteMenu = (id) => {
+    setMenu((prevMenus) => prevMenus.filter((menu) => menu.id !== id));
+    setNotification("Menu successfully deleted!");
+    setTimeout(() => setNotification(""), 3000);
+  };
 
   return (
     <div className="main-content menu-board container-fluid p-0">
       <div className="row g-0">
-        {/* Sidebar */}
         <Sidebar />
 
-        {/* Main Content */}
         <div className="col-10 col-lg-11">
-          {/* Navbar */}
           <Navbar
             isLoggedIn={isLoggedIn}
             username={username}
@@ -100,21 +96,33 @@ const MenuBoard = () => {
             handleLogout={handleLogout}
           />
 
-          {/* Header */}
+          {notification && (
+            <div
+              className="alert alert-success position-fixed"
+              style={{
+                top: "80px",
+                right: "20px",
+                zIndex: 1050,
+                minWidth: "250px",
+              }}
+            >
+              {notification}
+            </div>
+          )}
+
           <div className="d-flex justify-content-between align-items-center p-4">
             <h2 className="fw-bold">List Menu</h2>
             <p className="text-muted mb-0" style={{ marginRight: "380px" }}>
-              Total: {filteredMenu.length} Menu {/* Menampilkan total menu */}
+              Total: {filteredMenu.length} Menu
             </p>
           </div>
 
-          {/* Category Buttons */}
           <div className="d-flex gap-3 px-4 mb-4">
             {[
               { name: "All Menu" },
               { name: "Foods", icon: "/assets/reserve.svg" },
               { name: "Beverages", icon: "/assets/coffee.svg" },
-              { name: "Dessert", icon: "/assets/cake.svg" },
+              { name: "Desserts", icon: "/assets/cake.svg" },
             ].map((category) => (
               <button
                 key={category.name}
@@ -146,9 +154,7 @@ const MenuBoard = () => {
             ))}
           </div>
 
-          {/* Menu and Add Menu Section */}
           <div className="row px-4">
-            {/* Menu List */}
             <div className="col-lg-9">
               <div
                 style={{
@@ -158,11 +164,12 @@ const MenuBoard = () => {
                 }}
               >
                 <div className="row row-cols-1 row-cols-md-3 g-4">
-                  {filteredMenu.map((menuItem, index) => (
+                  {filteredMenu.map((menuItem) => (
                     <div
-                      key={index}
+                      key={menuItem.id}
                       className="col"
                       style={{ cursor: "pointer" }}
+                      onClick={() => setSelectedMenu(menuItem)}
                     >
                       <div className="card h-100">
                         <span
@@ -210,13 +217,21 @@ const MenuBoard = () => {
               </div>
             </div>
 
-            {/* Add Menu Section */}
             <div className="col-lg-3">
               <AddMenuCard menus={menu} setMenus={setMenu} />
             </div>
           </div>
         </div>
       </div>
+
+      {selectedMenu && (
+        <DetailMenuModal
+          menu={selectedMenu}
+          onClose={() => setSelectedMenu(null)}
+          onSave={handleSaveMenu}
+          onDelete={handleDeleteMenu}
+        />
+      )}
     </div>
   );
 };

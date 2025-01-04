@@ -92,5 +92,15 @@ const menuData = [
   })),
 ];
 
-// Ekspor data
+export const getMenuData = () => {
+  return menuData;
+};
+
+export const updateMenuData = (updatedMenu) => {
+  const menuIndex = menuData.findIndex((menu) => menu.id === updatedMenu.id);
+  if (menuIndex !== -1) {
+    menuData[menuIndex] = updatedMenu;
+  }
+};
+
 export default menuData;
