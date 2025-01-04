@@ -7,6 +7,11 @@ const Sidebar = () => {
 
   const icons = [
     {
+      src: "/assets/element-3.svg",
+      alt: "Dashboard Icon",
+      path: "/dashboard", // Ikon dashboard baru
+    },
+    {
       src: "/assets/shop.svg",
       alt: "Shop Icon",
       path: "/cashier-dashboard",
@@ -31,10 +36,10 @@ const Sidebar = () => {
     <div
       className="sidebar bg-light vh-100 d-flex flex-column align-items-center p-3 position-fixed"
       style={{
-        width: "80px", // Sidebar tetap dengan lebar tetap
-        top: 0, // Sidebar tetap berada di atas
-        left: 0, // Pastikan sidebar berada di sisi kiri layar
-        zIndex: 10, // Sidebar tetap di atas elemen lainnya
+        width: "80px", // Lebar tetap
+        top: 0, // Tetap di atas
+        left: 0, // Tetap di sisi kiri
+        zIndex: 10, // Di atas elemen lainnya
       }}
     >
       {/* Logo */}
@@ -66,12 +71,16 @@ const Sidebar = () => {
             border:
               location.pathname === icon.path ? "2px solid #3572EF" : "none",
             borderRadius: "10px",
+            transition: "all 0.3s ease", // Animasi transisi untuk efek hover dan aktif
           }}
         >
           <button
             onClick={() => handleIconClick(icon.path)}
             className="border-0 bg-transparent p-0"
-            style={{ cursor: "pointer" }}
+            style={{
+              cursor: "pointer",
+              outline: "none",
+            }}
           >
             <img
               src={icon.src}
@@ -82,6 +91,7 @@ const Sidebar = () => {
                 maxHeight: "30px",
                 filter:
                   location.pathname === icon.path ? "none" : "grayscale(100%)",
+                transition: "filter 0.3s ease", // Animasi transisi untuk hover
               }}
             />
           </button>
