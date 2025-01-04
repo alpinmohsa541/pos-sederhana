@@ -2,24 +2,30 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar/Sidebar";
 import Navbar from "../Navbar/Navbar";
+import logo from "/assets/logo.png";
 
 const Profile = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState("John Doe");
-  const [email, setEmail] = useState("johndoe@gmail.com");
-  const [status, setStatus] = useState("Active");
-  const [language, setLanguage] = useState("English");
-  const [role, setRole] = useState("Cashier");
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    role: "",
+  });
   const [preferenceMode, setPreferenceMode] = useState("Light Mode");
   const [fontSize, setFontSize] = useState("16 px");
   const [zoomDisplay, setZoomDisplay] = useState("100 (Normal)");
 
   const navigate = useNavigate();
 
+  // Ambil data dari localStorage saat komponen dimuat
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
-      setUsername(storedUser);
+      setUser({
+        name: storedUser.name,
+        email: storedUser.email || "johndoe@gmail.com", // Default email jika tidak ada
+        role: storedUser.role,
+      });
       setIsLoggedIn(true);
     } else {
       navigate("/"); // Redirect ke login jika belum login
@@ -27,14 +33,18 @@ const Profile = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("user"); // Hapus data pengguna dari localStorage
     setIsLoggedIn(false);
-    setUsername(null);
+    setUser(null);
     navigate("/");
   };
 
   const handleSaveChanges = () => {
-    alert("Changes have been saved!");
+    // Perbarui localStorage dengan data yang diubah
+    const updatedUser = { ...user };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+
+    alert("Profile changes have been saved!");
   };
 
   return (
@@ -47,7 +57,7 @@ const Profile = () => {
         {/* Navbar */}
         <Navbar
           isLoggedIn={isLoggedIn}
-          username={username}
+          username={user.name}
           handleLogout={handleLogout}
         />
 
@@ -66,9 +76,15 @@ const Profile = () => {
             <div className="row mb-3 align-items-center">
               <div className="col-md-3 d-flex flex-column align-items-center">
                 <img
-                  src="https://via.placeholder.com/100"
-                  alt="Profile"
-                  className="rounded-circle mb-2"
+                  src="/assets/profile.svg"
+                  alt="profile"
+                  className="rounded-circle"
+                  style={{
+                    width: "80px",
+                    height: "80px",
+                    objectFit: "cover",
+                    background: "#f0f0f0",
+                  }}
                 />
               </div>
               <div className="col-md-9 d-flex flex-column justify-content-center">
@@ -88,8 +104,10 @@ const Profile = () => {
                 <input
                   type="email"
                   className="form-control"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={user.email}
+                  onChange={(e) =>
+                    setUser((prev) => ({ ...prev, email: e.target.value }))
+                  }
                 />
               </div>
               <div className="col-md-6 mb-3">
@@ -97,17 +115,10 @@ const Profile = () => {
                 <input
                   type="text"
                   className="form-control"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Status</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={status}
-                  readOnly
+                  value={user.name}
+                  onChange={(e) =>
+                    setUser((prev) => ({ ...prev, name: e.target.value }))
+                  }
                 />
               </div>
               <div className="col-md-6 mb-3">
@@ -115,21 +126,9 @@ const Profile = () => {
                 <input
                   type="text"
                   className="form-control"
-                  value={role}
+                  value={user.role}
                   readOnly
                 />
-              </div>
-              <div className="col-md-6 mb-3">
-                <label className="form-label">Language</label>
-                <select
-                  className="form-select"
-                  value={language}
-                  onChange={(e) => setLanguage(e.target.value)}
-                >
-                  <option>English</option>
-                  <option>Spanish</option>
-                  <option>French</option>
-                </select>
               </div>
             </div>
 
