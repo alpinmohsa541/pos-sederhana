@@ -198,7 +198,7 @@ const CashierDashboard = () => {
           );
 
   return (
-    <div className="container-fluid p-0">
+    <div className="main-content cashier-dashboard container-fluid p-0">
       <div className="row g-0">
         {/* Sidebar */}
         <Sidebar />

@@ -11,6 +11,29 @@ const SalesReport = () => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [isFoodsModalOpen, setIsFoodsModalOpen] = useState(false);
 
+  // State untuk menyimpan waktu real-time
+  const [currentDate, setCurrentDate] = useState("");
+
+  useEffect(() => {
+    // Fungsi untuk memperbarui waktu
+    const updateDate = () => {
+      const now = new Date();
+      const options = {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      };
+      setCurrentDate(now.toLocaleDateString("en-US", options));
+    };
+
+    // Memperbarui waktu setiap detik
+    updateDate(); // Set waktu awal
+    const interval = setInterval(updateDate, 1000);
+
+    return () => clearInterval(interval); // Membersihkan interval saat komponen unmount
+  }, []);
+
   const handleRowClick = (order) => {
     setSelectedTransaction(order);
     setIsModalOpen(true);
@@ -226,7 +249,7 @@ const SalesReport = () => {
   };
 
   return (
-    <div className="container-fluid p-0">
+    <div className=" main-content sales-report container-fluid p-0">
       <div className="row g-0">
         {/* Sidebar */}
         <Sidebar />
@@ -241,14 +264,18 @@ const SalesReport = () => {
 
           <div className="container-fluid mt-4">
             {/* Label Sales Report */}
-            <div className="row mb-4">
+            <div className="row mb-4 align-items-center">
               <div className="col">
                 <h2 className="text">Sales Report</h2>
+              </div>
+              <div className="col text-end">
+                <p className="mb-0">{currentDate}</p>
               </div>
             </div>
             {/* Dashboard Summary */}
             <div className="row mb-4">
-              <div className="col">
+              {/* Card Total Order */}
+              <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-3">
                 <div className="card text">
                   <div className="card-body d-flex align-items-center">
                     <i
@@ -256,13 +283,17 @@ const SalesReport = () => {
                       style={{ fontSize: "2rem", color: "#007bff" }}
                     ></i>
                     <div>
-                      <h5 className="card-title mt-2">Total Order</h5>
-                      <p className="card-text">100</p>
+                      <h5 className="card-title mt-2 text-truncate">
+                        Total Order
+                      </h5>
+                      <p className="card-text fw-bold fs-5">100</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="col">
+
+              {/* Card Total Omzet */}
+              <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-3">
                 <div className="card">
                   <div className="card-body d-flex align-items-center">
                     <i
@@ -270,13 +301,15 @@ const SalesReport = () => {
                       style={{ fontSize: "2rem", color: "#28a745" }}
                     ></i>
                     <div>
-                      <h5 className="card-title">Total Omzet</h5>
-                      <p className="card-text">Rp 2.000.000</p>
+                      <h5 className="card-title text-truncate">Total Omzet</h5>
+                      <p className="card-text fw-bold fs-5">Rp 2.000.000</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="col">
+
+              {/* Card All Menu Sales */}
+              <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-3">
                 <div className="card">
                   <div className="card-body d-flex align-items-center">
                     <i
@@ -284,13 +317,17 @@ const SalesReport = () => {
                       style={{ fontSize: "2rem", color: "#ffc107" }}
                     ></i>
                     <div>
-                      <h5 className="card-title">All Menu Sales</h5>
-                      <p className="card-text">100</p>
+                      <h5 className="card-title text-truncate">
+                        All Menu Sales
+                      </h5>
+                      <p className="card-text fw-bold fs-5">100</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="col">
+
+              {/* Card Foods */}
+              <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-3">
                 <div className="card">
                   <div className="card-body d-flex align-items-center">
                     <i
@@ -298,13 +335,15 @@ const SalesReport = () => {
                       style={{ fontSize: "2rem", color: "#17a2b8" }}
                     ></i>
                     <div>
-                      <h5 className="card-title">Foods</h5>
-                      <p className="card-text">25</p>
+                      <h5 className="card-title text-truncate">Foods</h5>
+                      <p className="card-text fw-bold fs-5">25</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="col">
+
+              {/* Card Beverages */}
+              <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-3">
                 <div className="card">
                   <div className="card-body d-flex align-items-center">
                     <i
@@ -312,13 +351,15 @@ const SalesReport = () => {
                       style={{ fontSize: "2rem", color: "#fd7e14" }}
                     ></i>
                     <div>
-                      <h5 className="card-title">Beverages</h5>
-                      <p className="card-text">50</p>
+                      <h5 className="card-title text-truncate">Beverages</h5>
+                      <p className="card-text fw-bold fs-5">50</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="col">
+
+              {/* Card Desserts */}
+              <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-3">
                 <div className="card">
                   <div className="card-body d-flex align-items-center">
                     <i
@@ -326,8 +367,8 @@ const SalesReport = () => {
                       style={{ fontSize: "2rem", color: "#6f42c1" }}
                     ></i>
                     <div>
-                      <h5 className="card-title">Desserts</h5>
-                      <p className="card-text">50</p>
+                      <h5 className="card-title text-truncate">Desserts</h5>
+                      <p className="card-text fw-bold fs-5">50</p>
                     </div>
                   </div>
                 </div>
