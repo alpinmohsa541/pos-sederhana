@@ -5,28 +5,46 @@ const Sidebar = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const icons = [
+  // Ambil role user dari localStorage
+  const user = JSON.parse(localStorage.getItem("user"));
+  const userRole = user?.role || "cashier"; // Default role ke "cashier"
+
+  // Semua menu yang tersedia
+  const allIcons = [
     {
       src: "/assets/element-3.svg",
       alt: "Dashboard Icon",
-      path: "/dashboard", // Ikon dashboard baru
+      path: "/dashboard",
+      roles: ["admin"], // Hanya admin yang dapat melihat menu ini
+    },
+    {
+      src: "/assets/menu-board.svg",
+      alt: "menu-board",
+      path: "/menu-board",
+      roles: ["admin"], // Hanya admin yang dapat melihat menu ini
     },
     {
       src: "/assets/shop.svg",
       alt: "Shop Icon",
       path: "/cashier-dashboard",
+      roles: ["cashier"], // Admin dan cashier dapat melihat menu ini
     },
     {
       src: "/assets/clipboard-text.svg",
-      alt: "Clipboard Icon",
+      alt: "Sales Report Icon",
       path: "/sales-report",
+      roles: ["admin", "cashier"], // Hanya admin yang dapat melihat menu ini
     },
     {
       src: "/assets/setting-2.svg",
-      alt: "Setting Icon",
+      alt: "Settings Icon",
       path: "/profile",
+      roles: ["admin", "cashier"], // Admin dan cashier dapat melihat menu ini
     },
   ];
+
+  // Filter menu berdasarkan role user
+  const icons = allIcons.filter((icon) => icon.roles.includes(userRole));
 
   const handleIconClick = (path) => {
     navigate(path);

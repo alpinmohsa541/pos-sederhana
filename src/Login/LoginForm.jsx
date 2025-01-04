@@ -8,25 +8,44 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  // Simulasi daftar user dengan role
+  const users = [
+    {
+      name: "admin",
+      password: "admin123",
+      role: "admin",
+    },
+    {
+      name: "cashier",
+      password: "cashier123",
+      role: "cashier",
+    },
+  ];
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const storedUser = JSON.parse(localStorage.getItem("user"));
+    // Cari user yang cocok berdasarkan username dan password
+    const loggedInUser = users.find(
+      (user) => user.name === username && user.password === password
+    );
 
-    if (
-      storedUser &&
-      storedUser.name === username &&
-      storedUser.password === password
-    ) {
+    if (loggedInUser) {
+      // Simpan user ke localStorage
       localStorage.setItem(
         "user",
         JSON.stringify({
-          name: storedUser.name,
-          role: storedUser.role || "Cashier",
+          name: loggedInUser.name,
+          role: loggedInUser.role,
         })
       );
 
-      navigate("/cashier-dashboard"); // Redirect ke dashboard
+      // Redirect berdasarkan role
+      if (loggedInUser.role === "admin") {
+        navigate("/dashboard"); // Redirect ke admin dashboard
+      } else if (loggedInUser.role === "cashier") {
+        navigate("/cashier-dashboard"); // Redirect ke cashier dashboard
+      }
     } else {
       alert("Invalid username or password!");
     }
@@ -89,7 +108,7 @@ function LoginForm() {
                   bottom: "-20px",
                   right: "0px",
                   fontSize: "0.8rem",
-                  color: "gray", // Ubah warna teks menjadi abu-abu
+                  color: "gray",
                 }}
               >
                 Forget Password?
@@ -106,7 +125,7 @@ function LoginForm() {
           </form>
           <div className="text-center mt-3">
             <p className="mb-0">
-              Don`t have an account?{" "}
+              Don’t have an account?{" "}
               <Link
                 to="/register"
                 className="text-primary text-decoration-none"

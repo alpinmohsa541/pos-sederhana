@@ -39,6 +39,14 @@ const Dashboard = () => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleLogout = () => {
+    // Hapus data user dari localStorage dan reset state
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setUsername(null);
+    window.location.href = "/"; // Redirect ke halaman login
+  };
+
   const handleCardClick = (label) => {
     // Set data for each card modal
     const dataMap = {
@@ -134,7 +142,11 @@ const Dashboard = () => {
       {/* Main Content */}
       <div className="flex-grow-1">
         {/* Navbar */}
-        <Navbar isLoggedIn={isLoggedIn} username={username} />
+        <Navbar
+          isLoggedIn={isLoggedIn}
+          username={username}
+          handleLogout={handleLogout}
+        />
 
         {/* Dashboard */}
         <div className="container-fluid mt-4">
