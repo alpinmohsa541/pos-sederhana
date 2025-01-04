@@ -10,6 +10,7 @@ import SalesReport from "./SalesReport/SalesReport";
 import Profile from "./Profile/Profile"; // Import Profile page
 import Dashboard from "./Dashboard/Dashboard";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import MenuBoard from "./MenuBoard/MenuBoard";
 
 function App() {
   return (
@@ -30,7 +31,9 @@ function App() {
         {/* Route untuk halaman Profile */}
         <Route path="/profile" element={<Profile />} />
         {/* Route untuk halaman dashboard */}
-        <Route path="/dashboard" element={<Dashboard />} />{" "}
+        <Route path="/dashboard" element={<Dashboard />} />
+        {/* Route untuk halaman Menu board */}
+        <Route path="/menu-board" element={<MenuBoard />} />{" "}
       </Routes>
     </Router>
   );
