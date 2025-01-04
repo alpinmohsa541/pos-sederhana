@@ -18,7 +18,7 @@ function RegisterForm() {
     }
 
     // Store the registered user data in localStorage
-    const userData = { username, email, password };
+    const userData = { name: username, email, password, role: "Cashier" };
     localStorage.setItem("user", JSON.stringify(userData)); // Save to local storage
     console.log("User registered:", userData);
 
@@ -39,11 +39,11 @@ function RegisterForm() {
         className="card shadow"
         style={{ marginLeft: "20%", maxWidth: "400px", borderRadius: "15px" }}
       >
-        <div className="card-body p-4">
+        <div className="card-body p-4" style={{ width: "400px" }}>
           <div className="text-center mb-4">
             <img src={logo} alt="Logo" className="mb-3" />
-            <h3 className="fw-bold">Create an Account</h3>
-            <p className="text-muted">Fill in the details below to register</p>
+            <h3 className="fw-bold">Welcome Back!</h3>
+            <p className="text-muted">Create your account here!</p>
           </div>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
@@ -103,7 +103,7 @@ function RegisterForm() {
               />
             </div>
             <button type="submit" className="btn btn-primary w-100">
-              Register
+              Login
             </button>
           </form>
           <div className="text-center mt-3">

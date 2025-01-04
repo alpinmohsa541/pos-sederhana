@@ -27,12 +27,12 @@ function EmailForm() {
         className="card shadow"
         style={{ marginLeft: "20%", maxWidth: "400px", borderRadius: "15px" }}
       >
-        <div className="card-body p-4">
+        <div className="card-body p-4" style={{ width: "400px" }}>
           <div className="text-center mb-4">
             <img src={logo} alt="Logo" className="mb-3" />
             <h3 className="fw-bold">Reset Your Password</h3>
             <p className="text-muted">
-              Enter your email address to reset your password
+              Please enter your registered email here!
             </p>
           </div>
           <form onSubmit={handleSubmit}>
