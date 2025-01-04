@@ -4,6 +4,26 @@ import { useNavigate } from "react-router-dom";
 import menuData from "../CashierDashboard/DataMenu"; // Simulasi data menu
 import Navbar from "../Navbar/Navbar"; // Import Navbar
 import Sidebar from "../Sidebar/Sidebar"; // Import Sidebar
+import AddMenuCard from "./AddMenuCard";
+
+const AddMenu = ({ menus, setMenus }) => {
+  const [newMenu, setNewMenu] = useState("");
+
+  const handleAddMenu = () => {
+    if (newMenu.trim()) {
+      // Tambahkan menu baru ke dalam list menu
+      const newMenuItem = {
+        name: newMenu.trim(),
+        category: "Custom",
+        description: "New custom menu",
+        price: 0,
+        image: "/assets/default-image.jpg", // Placeholder image
+      };
+      setMenus([...menus, newMenuItem]);
+      setNewMenu("");
+    }
+  };
+};
 
 const MenuBoard = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -83,7 +103,7 @@ const MenuBoard = () => {
           {/* Header */}
           <div className="d-flex justify-content-between align-items-center p-4">
             <h2 className="fw-bold">List Menu</h2>
-            <p className="text-muted mb-0">
+            <p className="text-muted mb-0" style={{ marginRight: "380px" }}>
               Total: {filteredMenu.length} Menu {/* Menampilkan total menu */}
             </p>
           </div>
@@ -132,7 +152,7 @@ const MenuBoard = () => {
             <div className="col-lg-9">
               <div
                 style={{
-                  maxHeight: "600px", // Untuk scroll
+                  maxHeight: "600px",
                   overflowY: "auto",
                   paddingRight: "10px",
                 }}
@@ -192,24 +212,7 @@ const MenuBoard = () => {
 
             {/* Add Menu Section */}
             <div className="col-lg-3">
-              <div
-                className="card p-4"
-                style={{
-                  height: "100%",
-                  background: "#f8f9fa",
-                  border: "1px dashed #ced4da",
-                  textAlign: "center",
-                }}
-              >
-                <h5 className="mb-3">Add Menu</h5>
-                <button
-                  className="btn btn-outline-primary"
-                  style={{ fontSize: "2rem", width: "60px", height: "60px" }}
-                >
-                  +
-                </button>
-                <p className="mt-3 text-muted">Add Menu here</p>
-              </div>
+              <AddMenuCard menus={menu} setMenus={setMenu} />
             </div>
           </div>
         </div>

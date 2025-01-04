@@ -6,7 +6,7 @@ const menuData = [
     description:
       "Vegetables, egg, tempe, tofu, ketupat, peanut sauce, and kerupuk.",
     price: 20000,
-    category: "Food",
+    category: "foods",
     image: "/assets/image5.svg",
   },
   {
@@ -30,7 +30,7 @@ const menuData = [
     name: "Nasi Goreng Special",
     description: "Fried rice with egg, chicken, and vegetables.",
     price: 25000,
-    category: "Food",
+    category: "foods",
     image: "/assets/image5.svg",
   },
   {
@@ -54,7 +54,7 @@ const menuData = [
     name: "Mie Ayam Special",
     description: "Noodles with chicken and vegetables.",
     price: 22000,
-    category: "Food",
+    category: "foods",
     image: "/assets/image5.svg",
   },
   {
@@ -78,7 +78,7 @@ const menuData = [
     name: "Sate Ayam",
     description: "Chicken satay with peanut sauce.",
     price: 24000,
-    category: "Food",
+    category: "foods",
     image: "/assets/image5.svg",
   },
   // Tambahkan 40 data lainnya dengan variasi kategori
@@ -87,7 +87,7 @@ const menuData = [
     name: `Menu Item ${i + 11}`,
     description: `Description for menu item ${i + 11}`,
     price: Math.floor(Math.random() * 30000) + 5000, // Harga random antara 5000-35000
-    category: ["Food", "Beverages", "Dessert"][Math.floor(Math.random() * 3)], // Pilih kategori secara acak
+    category: ["foods", "Beverages", "Dessert"][Math.floor(Math.random() * 3)], // Pilih kategori secara acak
     image: "/assets/image5.svg", // Gambar berulang dari 1-10
   })),
 ];

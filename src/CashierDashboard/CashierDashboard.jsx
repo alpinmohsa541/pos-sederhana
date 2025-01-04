@@ -219,7 +219,7 @@ const CashierDashboard = () => {
               <div className="d-flex gap-3 mb-4">
                 {[
                   { name: "All Menu" },
-                  { name: "Food", icon: "/assets/reserve.svg" },
+                  { name: "Foods", icon: "/assets/reserve.svg" },
                   { name: "Beverages", icon: "/assets/coffee.svg" },
                   { name: "Dessert", icon: "/assets/cake.svg" },
                 ].map((category) => (
