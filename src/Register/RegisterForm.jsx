@@ -5,25 +5,49 @@ import logo from "/assets/logo.png";
 
 function RegisterForm() {
   const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(""); // Simpan jika ingin digunakan di backend
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const navigate = useNavigate(); // Used to navigate after successful registration
+  const [loading, setLoading] = useState(false); // State untuk loading
+  const navigate = useNavigate(); // Untuk navigasi setelah register
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
 
-    // Store the registered user data in localStorage
-    const userData = { name: username, email, password, role: "Cashier" };
-    localStorage.setItem("user", JSON.stringify(userData)); // Save to local storage
-    console.log("User registered:", userData);
+    setLoading(true); // Aktifkan loading
+    try {
+      // Kirim permintaan ke API register
+      const response = await fetch("http://localhost:3000/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username,
+          password,
+          name: username, // Menggunakan username sebagai name
+          role: "cashier", // Default role
+        }),
+      });
 
-    // Redirect to login page after successful registration
-    navigate("/");
+      const data = await response.json();
+
+      if (response.ok) {
+        alert(data.message || "Registration successful!");
+        navigate("/"); // Redirect ke halaman login
+      } else {
+        alert(data.message || "Registration failed!");
+      }
+    } catch (error) {
+      console.error("Registration failed:", error);
+      alert("Something went wrong. Please try again later.");
+    } finally {
+      setLoading(false); // Nonaktifkan loading
+    }
   };
 
   return (
@@ -102,8 +126,12 @@ function RegisterForm() {
                 required
               />
             </div>
-            <button type="submit" className="btn btn-primary w-100">
-              Login
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={loading} // Disable tombol saat loading
+            >
+              {loading ? "Registering..." : "Register"}
             </button>
           </form>
           <div className="text-center mt-3">

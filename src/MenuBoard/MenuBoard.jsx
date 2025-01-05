@@ -1,7 +1,6 @@
 import "../App.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMenuData, updateMenuData } from "../CashierDashboard/DataMenu"; // Update DataMenu import
 import Navbar from "../Navbar/Navbar";
 import Sidebar from "../Sidebar/Sidebar";
 import AddMenuCard from "./AddMenuCard";
@@ -9,8 +8,8 @@ import DetailMenuModal from "./DetailMenuModal";
 
 const MenuBoard = () => {
   const [selectedMenu, setSelectedMenu] = useState(null);
-  const [menu, setMenu] = useState(getMenuData()); // Ambil data dari DataMenu
-  const [filteredMenu, setFilteredMenu] = useState(getMenuData());
+  const [menu, setMenu] = useState([]); // Data menu dari API
+  const [filteredMenu, setFilteredMenu] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [activeCategory, setActiveCategory] = useState("All Menu");
@@ -18,6 +17,7 @@ const MenuBoard = () => {
   const [notification, setNotification] = useState("");
   const navigate = useNavigate();
 
+  // Ambil data user dari localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
@@ -27,6 +27,26 @@ const MenuBoard = () => {
       navigate("/");
     }
   }, [navigate]);
+
+  // Ambil data menu dari API
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/menus");
+        const data = await response.json();
+        if (response.ok) {
+          setMenu(data);
+          setFilteredMenu(data);
+        } else {
+          console.error("Failed to fetch menu:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching menu:", error);
+      }
+    };
+
+    fetchMenu();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("user");
@@ -63,23 +83,51 @@ const MenuBoard = () => {
     handleCategoryClick(activeCategory);
   }, [activeCategory, searchQuery, menu]);
 
-  const handleSaveMenu = (updatedMenu) => {
-    // Update state menu
-    setMenu((prevMenus) =>
-      prevMenus.map((menu) => (menu.id === updatedMenu.id ? updatedMenu : menu))
-    );
+  const handleSaveMenu = async (updatedMenu) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/menus/${updatedMenu.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(updatedMenu),
+        }
+      );
 
-    // Update data di DataMenu.jsx
-    updateMenuData(updatedMenu);
-
-    setNotification("Menu successfully updated!");
-    setTimeout(() => setNotification(""), 3000);
+      if (response.ok) {
+        setMenu((prevMenus) =>
+          prevMenus.map((menu) =>
+            menu.id === updatedMenu.id ? updatedMenu : menu
+          )
+        );
+        setNotification("Menu successfully updated!");
+        setTimeout(() => setNotification(""), 3000);
+      } else {
+        console.error("Failed to update menu");
+      }
+    } catch (error) {
+      console.error("Error updating menu:", error);
+    }
   };
 
-  const handleDeleteMenu = (id) => {
-    setMenu((prevMenus) => prevMenus.filter((menu) => menu.id !== id));
-    setNotification("Menu successfully deleted!");
-    setTimeout(() => setNotification(""), 3000);
+  const handleDeleteMenu = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:3000/menus/${id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setMenu((prevMenus) => prevMenus.filter((menu) => menu.id !== id));
+        setNotification("Menu successfully deleted!");
+        setTimeout(() => setNotification(""), 3000);
+      } else {
+        console.error("Failed to delete menu");
+      }
+    } catch (error) {
+      console.error("Error deleting menu:", error);
+    }
   };
 
   return (
@@ -120,9 +168,9 @@ const MenuBoard = () => {
           <div className="d-flex gap-3 px-4 mb-4">
             {[
               { name: "All Menu" },
-              { name: "Foods", icon: "/assets/reserve.svg" },
-              { name: "Beverages", icon: "/assets/coffee.svg" },
-              { name: "Desserts", icon: "/assets/cake.svg" },
+              { name: "Foods" },
+              { name: "Beverages" },
+              { name: "Desserts" },
             ].map((category) => (
               <button
                 key={category.name}
@@ -138,17 +186,6 @@ const MenuBoard = () => {
                 }}
                 onClick={() => handleCategoryClick(category.name)}
               >
-                {category.icon && (
-                  <img
-                    src={category.icon}
-                    alt={`${category.name} Icon`}
-                    style={{
-                      width: "20px",
-                      height: "20px",
-                      marginRight: "8px",
-                    }}
-                  />
-                )}
                 {category.name}
               </button>
             ))}

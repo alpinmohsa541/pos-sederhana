@@ -11,6 +11,7 @@ const AddMenuCard = ({ menus, setMenus }) => {
   });
 
   const [showNotification, setShowNotification] = useState(false); // State untuk notifikasi
+  const [loading, setLoading] = useState(false); // State untuk loading
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -31,7 +32,7 @@ const AddMenuCard = ({ menus, setMenus }) => {
     setMenuData({ ...menuData, image: null, imagePreview: null });
   };
 
-  const handleAddMenu = () => {
+  const handleAddMenu = async () => {
     if (
       !menuData.name ||
       !menuData.category ||
@@ -42,31 +43,47 @@ const AddMenuCard = ({ menus, setMenus }) => {
       return;
     }
 
-    const newMenu = {
-      ...menuData,
-      price: parseInt(menuData.price, 10),
-      image: menuData.imagePreview || "/assets/default-image.jpg", // Gunakan preview jika ada
-    };
+    setLoading(true); // Aktifkan loading
+    try {
+      const response = await fetch("http://localhost:3000/menus", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: menuData.name,
+          category: menuData.category,
+          price: parseInt(menuData.price, 10),
+          description: menuData.description,
+          image: menuData.imagePreview || "/assets/default-image.jpg", // Gunakan default jika tidak ada
+        }),
+      });
 
-    setMenus([...menus, newMenu]);
+      const data = await response.json();
 
-    // Reset form
-    setMenuData({
-      name: "",
-      category: "",
-      price: "",
-      description: "",
-      image: null,
-      imagePreview: null,
-    });
-
-    // Tampilkan notifikasi
-    setShowNotification(true);
-
-    // Sembunyikan notifikasi setelah 3 detik
-    setTimeout(() => {
-      setShowNotification(false);
-    }, 3000);
+      if (response.ok) {
+        setMenus([...menus, data]); // Tambahkan menu baru ke state
+        alert("New menu added successfully!");
+        // Reset form
+        setMenuData({
+          name: "",
+          category: "",
+          price: "",
+          description: "",
+          image: null,
+          imagePreview: null,
+        });
+        setShowNotification(true); // Tampilkan notifikasi
+        setTimeout(() => setShowNotification(false), 3000); // Sembunyikan notifikasi setelah 3 detik
+      } else {
+        alert(data.message || "Failed to add menu");
+      }
+    } catch (error) {
+      console.error("Error adding menu:", error);
+      alert("Something went wrong!");
+    } finally {
+      setLoading(false); // Nonaktifkan loading
+    }
   };
 
   return (
@@ -87,7 +104,7 @@ const AddMenuCard = ({ menus, setMenus }) => {
           className="notification"
           style={{
             position: "fixed",
-            top: "80px", // Tepat di bawah navbar
+            top: "80px",
             right: "20px",
             backgroundColor: "#e6f7e6",
             color: "#28a745",
@@ -210,8 +227,12 @@ const AddMenuCard = ({ menus, setMenus }) => {
         value={menuData.description}
         onChange={handleInputChange}
       />
-      <button className="btn btn-primary w-100" onClick={handleAddMenu}>
-        Save
+      <button
+        className="btn btn-primary w-100"
+        onClick={handleAddMenu}
+        disabled={loading} // Disable saat loading
+      >
+        {loading ? "Saving..." : "Save"}
       </button>
     </div>
   );
