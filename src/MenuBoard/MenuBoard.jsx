@@ -16,6 +16,8 @@ const MenuBoard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [notification, setNotification] = useState("");
   const navigate = useNavigate();
+  // Base URL untuk backend
+  const BASE_URL = "http://localhost:3000"; // Ganti dengan base URL backend Anda
 
   // Ambil data pengguna yang disimpan di local storage ketika komponen dimuat
   useEffect(() => {
@@ -28,11 +30,12 @@ const MenuBoard = () => {
       navigate("/"); // Redirect ke login jika belum login
     }
   }, [navigate]);
+
   // Ambil data menu dari API ketika komponen dimuat
   useEffect(() => {
     const fetchMenus = async () => {
       try {
-        const response = await fetch("http://localhost:3000/menus");
+        const response = await fetch("http://localhost:3000/api/menus");
         const data = await response.json();
         if (response.ok) {
           setMenus(data);
@@ -163,7 +166,11 @@ const MenuBoard = () => {
                           {menuItem.category}
                         </span>
                         <img
-                          src={menuItem.image || "/assets/default-image.jpg"} // Tampilkan gambar dari API atau gambar default
+                          src={
+                            menuItem.image
+                              ? `${BASE_URL}${menuItem.image}`
+                              : `${BASE_URL}/assets/default-image.jpg`
+                          } // Tampilkan gambar dari API atau gambar default
                           className="card-img-top"
                           alt={menuItem.name}
                           style={{ height: "150px", objectFit: "cover" }}
@@ -204,8 +211,6 @@ const MenuBoard = () => {
         <DetailMenuModal
           menu={selectedMenu}
           onClose={() => setSelectedMenu(null)}
-          onSave={handleSaveMenu}
-          onDelete={handleDeleteMenu}
         />
       )}
     </div>
