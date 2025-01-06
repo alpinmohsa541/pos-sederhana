@@ -5,6 +5,7 @@ import Navbar from "../Navbar/Navbar";
 import logo from "/assets/logo.png";
 
 const Profile = () => {
+  const [username, setUsername] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState({
     name: "",
@@ -18,14 +19,12 @@ const Profile = () => {
   const navigate = useNavigate();
 
   // Ambil data dari localStorage saat komponen dimuat
+
   useEffect(() => {
+    // Simulasi autentikasi pengguna
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
-      setUser({
-        name: storedUser.name,
-        email: storedUser.email || "johndoe@gmail.com", // Default email jika tidak ada
-        role: storedUser.role,
-      });
+      setUsername(storedUser);
       setIsLoggedIn(true);
     } else {
       navigate("/"); // Redirect ke login jika belum login
@@ -33,10 +32,10 @@ const Profile = () => {
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("user"); // Hapus data pengguna dari localStorage
+    localStorage.removeItem("user"); // Hapus data pengguna
     setIsLoggedIn(false);
-    setUser(null);
-    navigate("/");
+    setUsername(null);
+    navigate("/"); // Redirect ke halaman login
   };
 
   const handleSaveChanges = () => {
@@ -57,7 +56,7 @@ const Profile = () => {
         {/* Navbar */}
         <Navbar
           isLoggedIn={isLoggedIn}
-          username={user.name}
+          username={username}
           handleLogout={handleLogout}
         />
 

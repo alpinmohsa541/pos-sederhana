@@ -1,16 +1,15 @@
-import "../App.css";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMenuData, updateMenuData } from "../CashierDashboard/DataMenu"; // Update DataMenu import
 import Navbar from "../Navbar/Navbar";
 import Sidebar from "../Sidebar/Sidebar";
 import AddMenuCard from "./AddMenuCard";
 import DetailMenuModal from "./DetailMenuModal";
+import "../App.css";
 
 const MenuBoard = () => {
   const [selectedMenu, setSelectedMenu] = useState(null);
-  const [menu, setMenu] = useState(getMenuData()); // Ambil data dari DataMenu
-  const [filteredMenu, setFilteredMenu] = useState(getMenuData());
+  const [menus, setMenus] = useState([]);
+  const [filteredMenus, setFilteredMenus] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const [activeCategory, setActiveCategory] = useState("All Menu");
@@ -18,75 +17,73 @@ const MenuBoard = () => {
   const [notification, setNotification] = useState("");
   const navigate = useNavigate();
 
+  // Ambil data pengguna yang disimpan di local storage ketika komponen dimuat
   useEffect(() => {
+    // Simulasi autentikasi pengguna
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUsername(storedUser);
       setIsLoggedIn(true);
     } else {
-      navigate("/");
+      navigate("/"); // Redirect ke login jika belum login
     }
   }, [navigate]);
+  // Ambil data menu dari API ketika komponen dimuat
+  useEffect(() => {
+    const fetchMenus = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/menus");
+        const data = await response.json();
+        if (response.ok) {
+          setMenus(data);
+          setFilteredMenus(data); // Set filtered menu sama dengan data awal
+        } else {
+          console.error("Failed to fetch menus:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching menus:", error);
+      }
+    };
 
+    fetchMenus();
+  }, []);
+
+  // Logout handler
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("user"); // Hapus data pengguna
     setIsLoggedIn(false);
     setUsername(null);
-    navigate("/");
+    navigate("/"); // Redirect ke halaman login
   };
 
+  // Handle search change
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
-
-    const filtered = menu.filter(
+    const filtered = menus.filter(
       (item) =>
         item.name.toLowerCase().includes(query) &&
         (activeCategory === "All Menu" || item.category === activeCategory)
     );
-    setFilteredMenu(filtered);
+    setFilteredMenus(filtered);
   };
 
+  // Handle category filter
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
-
-    const filtered = menu.filter(
+    const filtered = menus.filter(
       (item) =>
         (category === "All Menu" ||
           item.category.toLowerCase() === category.toLowerCase()) &&
         item.name.toLowerCase().includes(searchQuery)
     );
-    setFilteredMenu(filtered);
-  };
-
-  useEffect(() => {
-    handleCategoryClick(activeCategory);
-  }, [activeCategory, searchQuery, menu]);
-
-  const handleSaveMenu = (updatedMenu) => {
-    // Update state menu
-    setMenu((prevMenus) =>
-      prevMenus.map((menu) => (menu.id === updatedMenu.id ? updatedMenu : menu))
-    );
-
-    // Update data di DataMenu.jsx
-    updateMenuData(updatedMenu);
-
-    setNotification("Menu successfully updated!");
-    setTimeout(() => setNotification(""), 3000);
-  };
-
-  const handleDeleteMenu = (id) => {
-    setMenu((prevMenus) => prevMenus.filter((menu) => menu.id !== id));
-    setNotification("Menu successfully deleted!");
-    setTimeout(() => setNotification(""), 3000);
+    setFilteredMenus(filtered);
   };
 
   return (
     <div className="main-content menu-board container-fluid p-0">
       <div className="row g-0">
         <Sidebar />
-
         <div className="col-10 col-lg-11">
           <Navbar
             isLoggedIn={isLoggedIn}
@@ -113,43 +110,23 @@ const MenuBoard = () => {
           <div className="d-flex justify-content-between align-items-center p-4">
             <h2 className="fw-bold">List Menu</h2>
             <p className="text-muted mb-0" style={{ marginRight: "380px" }}>
-              Total: {filteredMenu.length} Menu
+              Total: {filteredMenus.length} Menus
             </p>
           </div>
 
           <div className="d-flex gap-3 px-4 mb-4">
-            {[
-              { name: "All Menu" },
-              { name: "Foods", icon: "/assets/reserve.svg" },
-              { name: "Beverages", icon: "/assets/coffee.svg" },
-              { name: "Desserts", icon: "/assets/cake.svg" },
-            ].map((category) => (
+            {["All Menu", "Foods", "Beverages", "Desserts"].map((category) => (
               <button
-                key={category.name}
-                className={`btn d-flex align-items-center justify-content-center ${
-                  activeCategory === category.name
+                key={category}
+                className={`btn ${
+                  activeCategory === category
                     ? "btn-primary text-white"
                     : "btn-outline-primary"
                 }`}
-                style={{
-                  padding: "5px 10px",
-                  width: "175px",
-                  height: "55px",
-                }}
-                onClick={() => handleCategoryClick(category.name)}
+                style={{ padding: "5px 10px", width: "175px", height: "55px" }}
+                onClick={() => handleCategoryClick(category)}
               >
-                {category.icon && (
-                  <img
-                    src={category.icon}
-                    alt={`${category.name} Icon`}
-                    style={{
-                      width: "20px",
-                      height: "20px",
-                      marginRight: "8px",
-                    }}
-                  />
-                )}
-                {category.name}
+                {category}
               </button>
             ))}
           </div>
@@ -164,11 +141,10 @@ const MenuBoard = () => {
                 }}
               >
                 <div className="row row-cols-1 row-cols-md-3 g-4">
-                  {filteredMenu.map((menuItem) => (
+                  {filteredMenus.map((menuItem) => (
                     <div
-                      key={menuItem.id}
+                      key={menuItem.menu_id}
                       className="col"
-                      style={{ cursor: "pointer" }}
                       onClick={() => setSelectedMenu(menuItem)}
                     >
                       <div className="card h-100">
@@ -187,7 +163,7 @@ const MenuBoard = () => {
                           {menuItem.category}
                         </span>
                         <img
-                          src={menuItem.image}
+                          src={menuItem.image || "/assets/default-image.jpg"} // Tampilkan gambar dari API atau gambar default
                           className="card-img-top"
                           alt={menuItem.name}
                           style={{ height: "150px", objectFit: "cover" }}
@@ -218,7 +194,7 @@ const MenuBoard = () => {
             </div>
 
             <div className="col-lg-3">
-              <AddMenuCard menus={menu} setMenus={setMenu} />
+              <AddMenuCard menus={menus} setMenus={setMenus} />
             </div>
           </div>
         </div>

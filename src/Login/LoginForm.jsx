@@ -6,48 +6,49 @@ import logo from "/assets/logo.png";
 function LoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // State untuk loading
   const navigate = useNavigate();
 
-  // Simulasi daftar user dengan role
-  const users = [
-    {
-      name: "admin",
-      password: "admin123",
-      role: "admin",
-    },
-    {
-      name: "cashier",
-      password: "cashier123",
-      role: "cashier",
-    },
-  ];
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Aktifkan state loading
 
-    // Cari user yang cocok berdasarkan username dan password
-    const loggedInUser = users.find(
-      (user) => user.name === username && user.password === password
-    );
+    try {
+      // Kirim permintaan ke API login
+      const response = await fetch("http://localhost:3000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (loggedInUser) {
-      // Simpan user ke localStorage
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          name: loggedInUser.name,
-          role: loggedInUser.role,
-        })
-      );
+      const data = await response.json();
 
-      // Redirect berdasarkan role
-      if (loggedInUser.role === "admin") {
-        navigate("/dashboard"); // Redirect ke admin dashboard
-      } else if (loggedInUser.role === "cashier") {
-        navigate("/cashier-dashboard"); // Redirect ke cashier dashboard
+      if (response.ok) {
+        // Simpan user ke localStorage
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            name: data.name,
+            role: data.role,
+          })
+        );
+
+        // Redirect berdasarkan role
+        if (data.role === "admin") {
+          navigate("/dashboard"); // Redirect ke admin dashboard
+        } else if (data.role === "cashier") {
+          navigate("/cashier-dashboard"); // Redirect ke cashier dashboard
+        }
+      } else {
+        alert(data.message || "Invalid username or password!");
       }
-    } else {
-      alert("Invalid username or password!");
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Something went wrong. Please try again later.");
+    } finally {
+      setLoading(false); // Nonaktifkan state loading
     }
   };
 
@@ -114,13 +115,13 @@ function LoginForm() {
                 Forget Password?
               </Link>
             </div>
-            {/* Add margin-top to the button to move it down */}
             <button
               type="submit"
               className="btn btn-primary w-100"
               style={{ marginTop: "20px" }}
+              disabled={loading} // Disable tombol saat loading
             >
-              Login
+              {loading ? "Logging in..." : "Login"}
             </button>
           </form>
           <div className="text-center mt-3">

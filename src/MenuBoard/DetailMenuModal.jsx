@@ -29,9 +29,27 @@ const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
     onClose(); // Tutup modal
   };
 
-  const handleDelete = () => {
-    onDelete(menu.id); // Kirim ID menu yang ingin dihapus
-    onClose(); // Tutup modal
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/menus/${menu.menu_id}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        onDelete(menu.menu_id); // Kirim ID menu yang telah dihapus
+        alert("Menu successfully deleted!");
+      } else {
+        alert("Failed to delete menu!");
+      }
+    } catch (error) {
+      console.error("Error deleting menu:", error);
+      alert("An error occurred while deleting the menu.");
+    } finally {
+      onClose(); // Tutup modal
+    }
   };
 
   return (
