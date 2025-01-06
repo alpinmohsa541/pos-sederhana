@@ -6,10 +6,57 @@ import { useNavigate } from "react-router-dom"; // Tambahkan ini
 import FoodsModal from "./FoodsModal";
 import TransactionDetailModal from "./TransactionDetailModal";
 
+const BASE_URL = "http://localhost:3000/api"; // Base URL untuk backend API
+
 const SalesReport = () => {
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [isFoodsModalOpen, setIsFoodsModalOpen] = useState(false);
+  const [menus, setMenus] = useState([]);
+  const [menuCounts, setMenuCounts] = useState({
+    all: 0,
+    foods: 0,
+    beverages: 0,
+    desserts: 0,
+  });
+
+  // Fetch data menus dari API
+  useEffect(() => {
+    const fetchMenus = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/menus`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setMenus(data); // Set data menus
+          calculateMenuCounts(data); // Hitung jumlah per kategori
+        } else {
+          console.error("Failed to fetch menus:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching menus:", error);
+      }
+    };
+
+    fetchMenus();
+  }, []);
+
+  // Hitung jumlah menu berdasarkan kategori
+  const calculateMenuCounts = (data) => {
+    const all = data.length;
+    const foods = data.filter((menu) => menu.category === "Foods").length;
+    const beverages = data.filter(
+      (menu) => menu.category === "Beverages"
+    ).length;
+    const desserts = data.filter((menu) => menu.category === "Desserts").length;
+
+    setMenuCounts({
+      all,
+      foods,
+      beverages,
+      desserts,
+    });
+  };
 
   // State untuk menyimpan waktu real-time
   const [currentDate, setCurrentDate] = useState("");
@@ -302,7 +349,7 @@ const SalesReport = () => {
                     ></i>
                     <div>
                       <h5 className="card-title text-truncate">Total Omzet</h5>
-                      <p className="card-text fw-bold fs-5">Rp 2.000.000</p>
+                      <p className="card-text fw-bold fs-5">Rp 1.515.400</p>
                     </div>
                   </div>
                 </div>
@@ -317,10 +364,8 @@ const SalesReport = () => {
                       style={{ fontSize: "2rem", color: "#ffc107" }}
                     ></i>
                     <div>
-                      <h5 className="card-title text-truncate">
-                        All Menu Sales
-                      </h5>
-                      <p className="card-text fw-bold fs-5">100</p>
+                      <h5 className="card-title text-truncate">All Menu</h5>
+                      <p className="card-text fw-bold fs-5">{menuCounts.all}</p>
                     </div>
                   </div>
                 </div>
@@ -336,7 +381,9 @@ const SalesReport = () => {
                     ></i>
                     <div>
                       <h5 className="card-title text-truncate">Foods</h5>
-                      <p className="card-text fw-bold fs-5">25</p>
+                      <p className="card-text fw-bold fs-5">
+                        {menuCounts.foods}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -352,7 +399,9 @@ const SalesReport = () => {
                     ></i>
                     <div>
                       <h5 className="card-title text-truncate">Beverages</h5>
-                      <p className="card-text fw-bold fs-5">50</p>
+                      <p className="card-text fw-bold fs-5">
+                        {menuCounts.beverages}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -368,7 +417,9 @@ const SalesReport = () => {
                     ></i>
                     <div>
                       <h5 className="card-title text-truncate">Desserts</h5>
-                      <p className="card-text fw-bold fs-5">50</p>
+                      <p className="card-text fw-bold fs-5">
+                        {menuCounts.desserts}
+                      </p>
                     </div>
                   </div>
                 </div>
