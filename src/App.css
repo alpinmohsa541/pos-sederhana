@@ -16,6 +16,10 @@ body {
   z-index: 1050;
 } */
 
+.dashboard {
+  margin-top: 80px;
+}
+
 .menu-board {
   margin-top: 80px;
 }
