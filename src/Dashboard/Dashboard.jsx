@@ -136,7 +136,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="main-content d-flex vh-100">
+    <div className="main-content dashboard d-flex vh-100">
       {/* Sidebar */}
       <Sidebar />
       {/* Main Content */}
@@ -151,7 +151,7 @@ const Dashboard = () => {
         {/* Dashboard */}
         <div className="container-fluid mt-4">
           <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2>Dashboard</h2>
+            <h2>Dashboard Orders</h2>
             <p className="text-muted mb-0">Today, {currentDate}</p>
           </div>
 
