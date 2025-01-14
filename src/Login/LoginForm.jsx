@@ -15,13 +15,16 @@ function LoginForm() {
 
     try {
       // Kirim permintaan ke API login
-      const response = await fetch("http://localhost:3000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
+      const response = await fetch(
+        "https://backend-pos-rho.vercel.app/api/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username, password }), // Kirim data login
+        }
+      );
 
       const data = await response.json();
 

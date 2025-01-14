@@ -21,18 +21,23 @@ function RegisterForm() {
     setLoading(true); // Aktifkan loading
     try {
       // Kirim permintaan ke API register
-      const response = await fetch("http://localhost:3000/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          password,
-          name: username, // Menggunakan username sebagai name
-          role: "cashier", // Default role
-        }),
-      });
+      const response = await fetch(
+        "https://backend-pos-rho.vercel.app/api/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            password,
+            confirmPassword, // Menambahkan confirmPassword
+            name: username, // Menggunakan username sebagai name
+            email, // Menambahkan email
+            role: "cashier", // Default role
+          }),
+        }
+      );
 
       const data = await response.json();
 
