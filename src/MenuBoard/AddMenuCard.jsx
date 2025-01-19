@@ -47,20 +47,24 @@ const AddMenuCard = ({ menus, setMenus }) => {
     formData.append("category", menuData.category);
     formData.append("price", menuData.price);
     formData.append("description", menuData.description);
+
     if (menuData.image) {
-      formData.append("image", menuData.image);
+      formData.append("image", menuData.image); // Ensure the correct field name here
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/menus", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://backend-pos-rho.vercel.app/api/menus",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
 
       if (response.ok) {
-        setMenus([...menus, data]);
+        setMenus([...menus, data.menu]); // Make sure the backend response contains 'menu'
         alert("New menu added successfully!");
         setMenuData({
           name: "",

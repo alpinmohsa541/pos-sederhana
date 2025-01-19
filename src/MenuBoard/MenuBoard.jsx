@@ -17,7 +17,7 @@ const MenuBoard = () => {
   const [notification, setNotification] = useState("");
   const navigate = useNavigate();
   // Base URL untuk backend
-  const BASE_URL = "http://localhost:3000"; // Ganti dengan base URL backend Anda
+  const BASE_URL = "https://backend-pos-rho.vercel.app"; // Ganti dengan base URL backend Anda
 
   // Ambil data pengguna yang disimpan di local storage ketika komponen dimuat
   useEffect(() => {
@@ -35,7 +35,9 @@ const MenuBoard = () => {
   useEffect(() => {
     const fetchMenus = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/menus");
+        const response = await fetch(
+          "https://backend-pos-rho.vercel.app/api/menus"
+        );
         const data = await response.json();
         if (response.ok) {
           setMenus(data);
