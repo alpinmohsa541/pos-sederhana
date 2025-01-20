@@ -15,45 +15,47 @@ const MenuBoard = () => {
   const [activeCategory, setActiveCategory] = useState("All Menu");
   const [searchQuery, setSearchQuery] = useState("");
   const [notification, setNotification] = useState("");
+  const [loading, setLoading] = useState(false); // For loading state
   const navigate = useNavigate();
-  // Base URL untuk backend
+
   const BASE_URL = "https://backend-pos-rho.vercel.app"; // Ganti dengan base URL backend Anda
 
-  // Ambil data pengguna yang disimpan di local storage ketika komponen dimuat
+  // Ambil data pengguna dari localStorage saat komponen dimuat
   useEffect(() => {
-    // Simulasi autentikasi pengguna
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUsername(storedUser);
       setIsLoggedIn(true);
     } else {
-      navigate("/"); // Redirect ke login jika belum login
+      navigate("/"); // Redirect ke halaman login jika belum login
     }
   }, [navigate]);
 
-  // Ambil data menu dari API ketika komponen dimuat
-  useEffect(() => {
-    const fetchMenus = async () => {
-      try {
-        const response = await fetch(
-          "https://backend-pos-rho.vercel.app/api/menus"
-        );
-        const data = await response.json();
-        if (response.ok) {
-          setMenus(data);
-          setFilteredMenus(data); // Set filtered menu sama dengan data awal
-        } else {
-          console.error("Failed to fetch menus:", data.message);
-        }
-      } catch (error) {
-        console.error("Error fetching menus:", error);
+  // Ambil data menu dari API saat komponen dimuat
+  const fetchMenus = async () => {
+    try {
+      setLoading(true); // Set loading before fetching
+      const response = await fetch(
+        "https://backend-pos-rho.vercel.app/api/menus"
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setMenus(data);
+        setFilteredMenus(data); // Set filtered menus sama dengan data awal
+      } else {
+        console.error("Failed to fetch menus:", data.message);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching menus:", error);
+    } finally {
+      setLoading(false); // Set loading false after fetching
+    }
+  };
 
+  useEffect(() => {
     fetchMenus();
   }, []);
 
-  // Logout handler
   const handleLogout = () => {
     localStorage.removeItem("user"); // Hapus data pengguna
     setIsLoggedIn(false);
@@ -61,7 +63,6 @@ const MenuBoard = () => {
     navigate("/"); // Redirect ke halaman login
   };
 
-  // Handle search change
   const handleSearchChange = (e) => {
     const query = e.target.value.toLowerCase();
     setSearchQuery(query);
@@ -73,7 +74,6 @@ const MenuBoard = () => {
     setFilteredMenus(filtered);
   };
 
-  // Handle category filter
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
     const filtered = menus.filter(
@@ -83,6 +83,14 @@ const MenuBoard = () => {
         item.name.toLowerCase().includes(searchQuery)
     );
     setFilteredMenus(filtered);
+  };
+
+  // Fungsi untuk menangani penambahan menu baru
+  const handleMenuAdded = () => {
+    setTimeout(() => {
+      setNotification(""); // Clear notification after 3 seconds
+      fetchMenus(); // Refresh data after notification closed
+    }, 3000);
   };
 
   return (
@@ -172,7 +180,7 @@ const MenuBoard = () => {
                             menuItem.image
                               ? `${BASE_URL}${menuItem.image}`
                               : `${BASE_URL}/assets/default-image.jpg`
-                          } // Tampilkan gambar dari API atau gambar default
+                          }
                           className="card-img-top"
                           alt={menuItem.name}
                           style={{ height: "150px", objectFit: "cover" }}
@@ -203,7 +211,11 @@ const MenuBoard = () => {
             </div>
 
             <div className="col-lg-3">
-              <AddMenuCard menus={menus} setMenus={setMenus} />
+              <AddMenuCard
+                menus={menus}
+                setMenus={setMenus}
+                onMenuAdded={handleMenuAdded} // Pastikan fungsi ini diteruskan ke AddMenuCard
+              />
             </div>
           </div>
         </div>

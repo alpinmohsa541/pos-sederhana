@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // Base URL untuk backend, sesuaikan dengan URL tempat server Anda berjalan
-const BASE_URL = "https://backend-pos-rho.vercel.app"; // Ganti dengan URL backend Anda
+const BASE_URL = "https://backend-pos-rho.vercel.app";
 
 const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
   const [menuData, setMenuData] = useState({
@@ -13,7 +13,7 @@ const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
     image: menu.image,
     imagePreview: menu.image
       ? `${BASE_URL}${menu.image}`
-      : "/assets/default-image.jpg", // Menggunakan base URL untuk preview
+      : "/assets/default-image.jpg",
   });
 
   // Menghandle perubahan input
@@ -34,23 +34,24 @@ const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
   // Menyimpan perubahan data menu
   const handleSave = async () => {
     try {
-      // Mengirim data yang telah diubah ke server
       const formData = new FormData();
       formData.append("name", menuData.name);
       formData.append("category", menuData.category);
       formData.append("price", menuData.price);
       formData.append("description", menuData.description);
-      if (menuData.image) formData.append("image", menuData.image);
+      if (menuData.image instanceof File) {
+        formData.append("image", menuData.image);
+      }
 
-      const response = await fetch(`${BASE_URL}/menus/${menu.menu_id}`, {
-        method: "PUT", // Menggunakan PUT untuk update data
+      const response = await fetch(`${BASE_URL}/api/menus/${menu._id}`, {
+        method: "PUT",
         body: formData,
       });
 
       const updatedMenu = await response.json();
 
       if (response.ok) {
-        onSave(updatedMenu); // Mengirim menu yang telah diupdate ke parent
+        onSave(updatedMenu);
         alert("Menu successfully updated!");
       } else {
         alert(
@@ -63,29 +64,38 @@ const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
         "An error occurred while updating the menu. Please try again later."
       );
     } finally {
-      onClose(); // Tutup modal setelah penghapusan
+      onClose();
     }
   };
 
   // Menghapus menu
   const handleDelete = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/menus/${menu.menu_id}`, {
+      const response = await fetch(`${BASE_URL}/api/menus/${menu._id}`, {
         method: "DELETE",
       });
 
-      if (response.ok) {
-        onDelete(menu.menu_id); // Menghapus menu dari UI setelah penghapusan berhasil
+      console.log("Response Status:", response.status);
+      console.log("Response OK:", response.ok);
+
+      const responseData = await response.json();
+      console.log("Response Data:", responseData);
+
+      if (response.ok && responseData.message === "Menu deleted successfully") {
+        onDelete(menu._id);
         alert("Menu successfully deleted!");
       } else {
-        const errorData = await response.json();
-        alert(`Failed to delete menu: ${errorData.message || "Unknown error"}`);
+        alert(
+          `Failed to delete menu: ${responseData.message || "Unknown error"}`
+        );
       }
     } catch (error) {
       console.error("Error deleting menu:", error);
-      alert("Menu successfully updated!");
+      alert(
+        "An error occurred while deleting the menu. Please try again later."
+      );
     } finally {
-      onClose(); // Tutup modal setelah penghapusan
+      onClose();
     }
   };
 
@@ -117,7 +127,6 @@ const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
                 className="img-fluid rounded"
                 style={{ maxHeight: "200px", objectFit: "cover" }}
               />
-
               <div className="mt-2">
                 <input
                   type="file"

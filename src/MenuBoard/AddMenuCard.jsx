@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const AddMenuCard = ({ menus, setMenus }) => {
+const AddMenuCard = ({ menus, setMenus, onMenuAdded }) => {
   const [menuData, setMenuData] = useState({
     name: "",
     category: "",
@@ -49,23 +49,21 @@ const AddMenuCard = ({ menus, setMenus }) => {
     formData.append("description", menuData.description);
 
     if (menuData.image) {
-      formData.append("image", menuData.image); // Ensure the correct field name here
+      formData.append("image", menuData.image);
     }
 
     try {
-      const response = await fetch(
-        "https://backend-pos-rho.vercel.app/api/menus",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch("http://localhost:3000/api/menus", {
+        method: "POST",
+        body: formData,
+      });
 
       const data = await response.json();
 
       if (response.ok) {
-        setMenus([...menus, data.menu]); // Make sure the backend response contains 'menu'
-        alert("New menu added successfully!");
+        // Menambahkan menu baru ke state `menus`
+        setMenus((prevMenus) => [...prevMenus, data.menu]);
+
         setMenuData({
           name: "",
           category: "",
@@ -74,8 +72,12 @@ const AddMenuCard = ({ menus, setMenus }) => {
           image: null,
           imagePreview: null,
         });
+
         setShowNotification(true);
         setTimeout(() => setShowNotification(false), 3000);
+
+        // Panggil callback setelah menu berhasil ditambahkan
+        onMenuAdded();
       } else {
         alert(data.message || "Failed to add menu");
       }
