@@ -26,8 +26,8 @@ const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const previewURL = URL.createObjectURL(file);
-      setMenuData({ ...menuData, image: file, imagePreview: previewURL });
+      const previewURL = URL.createObjectURL(file); // Membuat preview URL untuk gambar baru
+      setMenuData({ ...menuData, image: file, imagePreview: previewURL }); // Update state dengan file baru dan preview-nya
     }
   };
 
@@ -122,7 +122,7 @@ const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
             {/* Image Preview */}
             <div className="text-center mb-3">
               <img
-                src={menuData.imagePreview}
+                src={menuData.imagePreview} // Gambar yang di-preview
                 alt="Menu"
                 className="img-fluid rounded"
                 style={{ maxHeight: "200px", objectFit: "cover" }}
@@ -133,7 +133,7 @@ const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
                   accept="image/*"
                   id="fileUpload"
                   style={{ display: "none" }}
-                  onChange={handleFileChange}
+                  onChange={handleFileChange} // Menangani perubahan file
                 />
                 <label
                   htmlFor="fileUpload"

@@ -53,10 +53,13 @@ const AddMenuCard = ({ menus, setMenus, onMenuAdded }) => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/menus", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://backend-pos-rho.vercel.app/api/menus",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
 
