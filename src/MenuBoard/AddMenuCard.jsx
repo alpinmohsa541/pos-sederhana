@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const AddMenuCard = ({ menus, setMenus, onMenuAdded }) => {
   const [menuData, setMenuData] = useState({
