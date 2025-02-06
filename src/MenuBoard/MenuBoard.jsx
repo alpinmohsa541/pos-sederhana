@@ -15,12 +15,11 @@ const MenuBoard = () => {
   const [activeCategory, setActiveCategory] = useState("All Menu");
   const [searchQuery, setSearchQuery] = useState("");
   const [notification, setNotification] = useState("");
-  const [loading, setLoading] = useState(false); // For loading state
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const BASE_URL = "https://backend-pos-rho.vercel.app"; // Ganti dengan base URL backend Anda
 
-  // Ambil data pengguna dari localStorage saat komponen dimuat
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
@@ -31,13 +30,10 @@ const MenuBoard = () => {
     }
   }, [navigate]);
 
-  // Ambil data menu dari API saat komponen dimuat
   const fetchMenus = async () => {
     try {
-      setLoading(true); // Set loading before fetching
-      const response = await fetch(
-        "https://backend-pos-rho.vercel.app/api/menus"
-      );
+      setLoading(true);
+      const response = await fetch(`${BASE_URL}/api/menus`);
       const data = await response.json();
       if (response.ok) {
         setMenus(data);
@@ -48,7 +44,7 @@ const MenuBoard = () => {
     } catch (error) {
       console.error("Error fetching menus:", error);
     } finally {
-      setLoading(false); // Set loading false after fetching
+      setLoading(false);
     }
   };
 
@@ -57,10 +53,10 @@ const MenuBoard = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("user"); // Hapus data pengguna
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
     setUsername(null);
-    navigate("/"); // Redirect ke halaman login
+    navigate("/");
   };
 
   const handleSearchChange = (e) => {
@@ -85,10 +81,9 @@ const MenuBoard = () => {
     setFilteredMenus(filtered);
   };
 
-  // Fungsi untuk menangani penambahan menu baru
   const handleMenuAdded = () => {
     setTimeout(() => {
-      setNotification(""); // Clear notification after 3 seconds
+      setNotification("");
       fetchMenus(); // Refresh data after notification closed
     }, 3000);
   };
@@ -156,7 +151,7 @@ const MenuBoard = () => {
                 <div className="row row-cols-1 row-cols-md-3 g-4">
                   {filteredMenus.map((menuItem) => (
                     <div
-                      key={menuItem.menu_id}
+                      key={menuItem._id}
                       className="col"
                       onClick={() => setSelectedMenu(menuItem)}
                     >
@@ -178,7 +173,7 @@ const MenuBoard = () => {
                         <img
                           src={
                             menuItem.image
-                              ? `${BASE_URL}${menuItem.image}`
+                              ? menuItem.image // Gunakan URL lengkap dari API
                               : `${BASE_URL}/assets/default-image.jpg`
                           }
                           className="card-img-top"
@@ -214,7 +209,7 @@ const MenuBoard = () => {
               <AddMenuCard
                 menus={menus}
                 setMenus={setMenus}
-                onMenuAdded={handleMenuAdded} // Pastikan fungsi ini diteruskan ke AddMenuCard
+                onMenuAdded={handleMenuAdded}
               />
             </div>
           </div>
