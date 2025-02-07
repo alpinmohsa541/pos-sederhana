@@ -1,55 +1,59 @@
 import "../App.css";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Tambahkan ini
-import menuData from "./DataMenu";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar/Navbar"; // Import komponen Navbar
-import Sidebar from "../Sidebar/Sidebar"; // Sesuaikan path dengan struktur folder
+import Sidebar from "../Sidebar/Sidebar"; // Import komponen Sidebar
 
 const CashierDashboard = () => {
+  // State untuk autentikasi dan user
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState("");
   const navigate = useNavigate();
+
+  // State untuk filter dan pencarian menu
   const [activeButton, setActiveButton] = useState("All Menu");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // State untuk order dan pembayaran
   const [orders, setOrders] = useState([]);
   const [total, setTotal] = useState(0);
   const [orderType, setOrderType] = useState("");
   const [orderNumber, setOrderNumber] = useState("");
-  // const [orderArchive, setOrderArchive] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedMenu, setSelectedMenu] = useState(null);
   const [note, setNote] = useState("");
-  const [customerName, setCustomerName] = useState(""); // Tambahkan state untuk customerName
+  const [customerName, setCustomerName] = useState(""); // Nama pelanggan
   const [paymentNominal, setPaymentNominal] = useState(0);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [tableNumber, setTableNumber] = useState(""); // State untuk menyimpan nomor meja
+  const [tableNumber, setTableNumber] = useState(""); // Nomor meja untuk dine in
   const [subtotal, setSubtotal] = useState(0);
   const [tax, setTax] = useState(0);
   const [receivedAmount, setReceivedAmount] = useState(0);
   const [changeAmount, setChangeAmount] = useState(0);
-  const [menus, setMenus] = useState([]); // State untuk menyimpan data menu
+  const [menus, setMenus] = useState([]); // Data menu yang diambil dari API
 
-  const BASE_URL = "https://backend-pos-rho.vercel.app"; // Ganti dengan base URL backend Anda
+  const BASE_URL = "https://backend-pos-rho.vercel.app"; // Base URL backend
 
+  // Ambil data user dari localStorage saat komponen pertama kali dirender
   useEffect(() => {
-    // Ambil data pengguna dari localStorage
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
-      setUsername(storedUser);
+      // Asumsikan storedUser adalah objek dengan properti username
+      setUsername(storedUser.username || storedUser);
       setIsLoggedIn(true);
     } else {
-      navigate("/"); // Redirect ke login jika belum login
+      navigate("/");
     }
   }, [navigate]);
 
+  // Fetch data menu dari API saat komponen dirender
   useEffect(() => {
-    // Fetch data menu dari API
     const fetchMenus = async () => {
       try {
         const response = await fetch(`${BASE_URL}/api/menus`);
         const data = await response.json();
         if (response.ok) {
-          setMenus(data); // Menyimpan data menu yang di-fetch ke state menus
+          setMenus(data);
         } else {
           console.error("Failed to fetch menus:", data.message);
         }
@@ -59,62 +63,62 @@ const CashierDashboard = () => {
     };
 
     fetchMenus();
-  }, []); // Mengambil data menu saat komponen pertama kali dirender
+  }, []);
 
+  // Fungsi untuk logout
   const handleLogout = () => {
-    localStorage.removeItem("user"); // Hapus data pengguna
+    localStorage.removeItem("user");
     setIsLoggedIn(false);
     setUsername(null);
-    navigate("/"); // Redirect ke halaman login
+    navigate("/");
   };
 
+  // Generate nomor order secara acak
   const generateOrderNumber = () => {
     const randomNum = Math.floor(Math.random() * 1000000000);
     return `ORDR#${randomNum}`;
   };
 
+  // Set nomor order setiap kali daftar order berubah
   useEffect(() => {
     setOrderNumber(generateOrderNumber());
   }, [orders]);
 
+  // Hitung total order (subtotal + tax)
   useEffect(() => {
-    const subtotal = orders.reduce(
+    const calculatedSubtotal = orders.reduce(
       (acc, order) => acc + order.price * order.quantity,
       0
     );
-    const tax = subtotal * 0.1; // 10% tax
-    const totalAmount = subtotal + tax;
-
-    setTotal(totalAmount); // Set total ke state
+    const calculatedTax = calculatedSubtotal * 0.1; // Pajak 10%
+    const totalAmount = calculatedSubtotal + calculatedTax;
+    setTotal(totalAmount);
   }, [orders]);
 
+  // Ganti kategori menu yang aktif
   const handleButtonClick = (buttonName) => {
     setActiveButton(buttonName);
   };
 
+  // Fungsi untuk memproses pembayaran
   const handlePayment = () => {
     if (paymentNominal >= total) {
-      // Hitung subtotal dan tax
       const calculatedSubtotal = orders.reduce(
         (acc, order) => acc + order.price * order.quantity,
         0
       );
       const calculatedTax = calculatedSubtotal * 0.1;
       const calculatedTotal = calculatedSubtotal + calculatedTax;
-
-      // Hitung kembalian
       const calculatedChange = paymentNominal - calculatedTotal;
 
-      // Simpan nilai ke state
-      setSubtotal(calculatedSubtotal); // Simpan Subtotal
-      setTax(calculatedTax); // Simpan Tax
-      setReceivedAmount(paymentNominal); // Simpan nilai Diterima
-      setChangeAmount(calculatedChange); // Simpan Kembalian
+      setSubtotal(calculatedSubtotal);
+      setTax(calculatedTax);
+      setReceivedAmount(paymentNominal);
+      setChangeAmount(calculatedChange);
 
-      // Tampilkan modal sukses
       setShowSuccessModal(true);
 
-      // Reset state utama
+      // Reset order dan input nominal
       setOrders([]);
       setPaymentNominal(0);
       setTotal(0);
@@ -123,10 +127,12 @@ const CashierDashboard = () => {
     }
   };
 
+  // Update query pencarian
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
+  // Tambahkan order ke dalam daftar order
   const handleAddOrder = (newOrder) => {
     const existingOrder = orders.find((order) => order.id === newOrder.id);
     if (existingOrder) {
@@ -140,11 +146,12 @@ const CashierDashboard = () => {
     } else {
       setOrders([
         ...orders,
-        { ...newOrder, quantity: 1, price: newOrder.price || 0 }, // Pastikan price ada
+        { ...newOrder, quantity: 1, price: newOrder.price || 0 },
       ]);
     }
   };
 
+  // Fungsi untuk menambah kuantitas order
   const handleIncreaseOrder = (orderId) => {
     setOrders(
       orders.map((order) =>
@@ -154,12 +161,8 @@ const CashierDashboard = () => {
       )
     );
   };
-  const handleRemoveOrder = (orderId) => {
-    setOrders((prevOrders) =>
-      prevOrders.filter((order) => order.id !== orderId)
-    );
-  };
 
+  // Fungsi untuk mengurangi kuantitas order
   const handleDecreaseOrder = (orderId) => {
     setOrders(
       orders.map((order) =>
@@ -170,10 +173,18 @@ const CashierDashboard = () => {
     );
   };
 
+  // Fungsi untuk menghapus order
+  const handleRemoveOrder = (orderId) => {
+    setOrders(orders.filter((order) => order.id !== orderId));
+  };
+
+  // Update tipe order (Dine In atau Take Away)
   const handleOrderTypeChange = (type) => {
     setOrderType(type);
   };
 
+  // Tampilkan modal input catatan jika order type adalah Take Away,
+  // atau langsung tambahkan order jika tipe Dine In
   const handleShowModalOrAddOrder = (menu) => {
     if (!orderType) {
       alert("Please select 'Dine In' or 'Take Away' first!");
@@ -188,12 +199,14 @@ const CashierDashboard = () => {
     }
   };
 
+  // Tutup modal catatan
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedMenu(null);
     setNote("");
   };
 
+  // Tambahkan order dari modal catatan
   const handleSubmitToOrder = () => {
     if (selectedMenu) {
       const menuWithNote = { ...selectedMenu, note };
@@ -202,6 +215,7 @@ const CashierDashboard = () => {
     }
   };
 
+  // Fungsi untuk memformat harga ke format Rupiah
   const formatPriceToIDR = (price) =>
     new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -209,6 +223,7 @@ const CashierDashboard = () => {
       maximumFractionDigits: 0,
     }).format(price);
 
+  // Filter daftar menu berdasarkan kategori dan pencarian
   const filteredMenu =
     activeButton === "All Menu"
       ? menus.filter((menu) =>
@@ -219,14 +234,13 @@ const CashierDashboard = () => {
           .filter((menu) =>
             menu.name.toLowerCase().includes(searchQuery.toLowerCase())
           );
+
   return (
     <div className="main-content cashier-dashboard container-fluid p-0">
       <div className="row g-0">
-        {/* Sidebar */}
         <Sidebar />
 
-        {/* Main Content */}
-        <div className="col-10 col-lg-11">
+        <div className="col-12 col-lg-11">
           <Navbar
             isLoggedIn={isLoggedIn}
             username={username}
@@ -235,409 +249,385 @@ const CashierDashboard = () => {
             handleLogout={handleLogout}
           />
 
-          <div className="d-flex justify-content-between p-4 align-items-start">
-            {/* Kategori Menu */}
-            <div className="flex-grow-1 me-4">
-              <div className="d-flex gap-3 mb-4">
-                {[
-                  { name: "All Menu" },
-                  { name: "Foods", icon: "/assets/reserve.svg" },
-                  { name: "Beverages", icon: "/assets/coffee.svg" },
-                  { name: "Dessert", icon: "/assets/cake.svg" },
-                ].map((category) => (
-                  <button
-                    key={category.name}
-                    className={`btn d-flex align-items-center justify-content-center ${
-                      activeButton === category.name
-                        ? "btn-primary text-white"
-                        : "btn-outline-primary"
-                    }`}
-                    style={{
-                      padding: "5px 10px",
-                      width: "175px",
-                      height: "55px",
-                      marginRight: "15px", // Menambahkan jarak 15px antara menu
-                    }}
-                    onClick={() => handleButtonClick(category.name)}
-                  >
-                    {category.icon && (
-                      <img
-                        src={category.icon}
-                        alt={`${category.name} Icon`}
+          {/* Layout responsif menggunakan grid Bootstrap */}
+          <div className="container-fluid p-4">
+            <div className="row">
+              {/* Section Daftar Menu */}
+              <div className="col-12 col-lg-8 mb-4">
+                <div className="d-flex flex-column">
+                  <div className="d-flex flex-wrap gap-3 mb-4">
+                    {[
+                      { name: "All Menu" },
+                      { name: "Foods", icon: "/assets/reserve.svg" },
+                      { name: "Beverages", icon: "/assets/coffee.svg" },
+                      { name: "Dessert", icon: "/assets/cake.svg" },
+                    ].map((category) => (
+                      <button
+                        key={category.name}
+                        className={`btn d-flex align-items-center justify-content-center ${
+                          activeButton === category.name
+                            ? "btn-primary text-white"
+                            : "btn-outline-primary"
+                        }`}
                         style={{
-                          width: "20px",
-                          height: "20px",
-                          marginRight: "8px",
+                          padding: "5px 10px",
+                          minWidth: "150px",
+                          height: "55px",
                         }}
-                      />
-                    )}
-                    {category.name}
-                  </button>
-                ))}
+                        onClick={() => handleButtonClick(category.name)}
+                      >
+                        {category.icon && (
+                          <img
+                            src={category.icon}
+                            alt={`${category.name} Icon`}
+                            style={{
+                              width: "20px",
+                              height: "20px",
+                              marginRight: "8px",
+                            }}
+                          />
+                        )}
+                        {category.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* List Menu */}
+                  <div className="position-relative">
+                    <div className="mb-2">
+                      <h2>List Menu</h2>
+                      <span className="text-muted">
+                        Total: {filteredMenu.length} Menu
+                      </span>
+                    </div>
+                    <div
+                      className="scroll-container"
+                      style={{ maxHeight: "600px", overflowY: "auto" }}
+                    >
+                      <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2">
+                        {filteredMenu.map((menu) => (
+                          <div
+                            key={menu.id}
+                            className="col"
+                            onClick={() => handleShowModalOrAddOrder(menu)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <div className="card h-100">
+                              <span
+                                className="badge bg-primary"
+                                style={{
+                                  fontSize: "0.7rem",
+                                  padding: "3px 8px",
+                                  borderRadius: "20px",
+                                  position: "absolute",
+                                  top: "5px",
+                                  right: "5px",
+                                  zIndex: "10",
+                                }}
+                              >
+                                {menu.category}
+                              </span>
+                              <img
+                                src={menu.image}
+                                className="card-img-top"
+                                alt={menu.name}
+                                style={{ height: "100px", objectFit: "cover" }}
+                              />
+                              <div className="card-body">
+                                <h6
+                                  className="card-title"
+                                  style={{ fontSize: "0.9rem" }}
+                                >
+                                  {menu.name}
+                                </h6>
+                                <p
+                                  className="card-text text-muted"
+                                  style={{ fontSize: "0.8rem" }}
+                                >
+                                  {menu.description}
+                                </p>
+                                <p
+                                  className="card-text"
+                                  style={{ fontSize: "0.9rem" }}
+                                >
+                                  <span
+                                    style={{
+                                      color: "blue",
+                                      fontWeight: "bold",
+                                    }}
+                                  >
+                                    {formatPriceToIDR(menu.price)}
+                                  </span>{" "}
+                                  <span style={{ color: "black" }}>
+                                    /portion
+                                  </span>
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Menu List */}
-              <div className="row g-4 px-4">
-                <h2>List Menu</h2>
+              {/* Section Order */}
+              <div className="col-12 col-lg-4">
                 <div
-                  className="position-absolute"
+                  className="bg-light p-4 d-flex flex-column h-100"
                   style={{
-                    left: "780px",
-                    fontSize: "1rem",
-                    padding: "5px 10px",
-                    borderRadius: "5px",
-                    color: "#6c757d",
+                    borderRadius: "15px",
+                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
                   }}
                 >
-                  Total: {filteredMenu.length} Menu
-                </div>
-                <div className="col-md-12">
-                  {/* Container untuk scrollable list */}
-                  <div
-                    style={{
-                      maxHeight: "600px", // Sesuaikan untuk layar kecil
-                      overflowY: "auto",
-                      paddingRight: "10px",
-                    }}
-                    className="scroll-container"
+                  <h3>List Order</h3>
+                  <p
+                    className="no-order"
+                    style={{ fontSize: "10px", fontFamily: "sans-serif" }}
                   >
-                    <div className="row row-cols-1 row-cols-md-4 g-2">
-                      {filteredMenu.map((menu) => (
-                        <div
-                          key={menu.id}
-                          className="col"
-                          onClick={() => handleShowModalOrAddOrder(menu)} // Klik card langsung tambahkan menu atau tampilkan modal
-                          style={{ cursor: "pointer" }}
+                    No Order: {orderNumber}
+                  </p>
+                  <div className="mt-3 d-flex justify-content-between gap-2">
+                    <button
+                      className={`btn w-50 ${
+                        orderType === "dineIn"
+                          ? "btn-primary text-white"
+                          : "btn-outline-primary"
+                      }`}
+                      onClick={() => handleOrderTypeChange("dineIn")}
+                    >
+                      Dine In
+                    </button>
+                    <button
+                      className={`btn w-50 ${
+                        orderType === "takeAway"
+                          ? "btn-primary text-white"
+                          : "btn-outline-primary"
+                      }`}
+                      onClick={() => handleOrderTypeChange("takeAway")}
+                    >
+                      Take Away
+                    </button>
+                  </div>
+                  <div className="mt-3">
+                    <div className="row g-2">
+                      <div className="col-12 col-md-6">
+                        <label
+                          htmlFor="customerName"
+                          className="form-label"
+                          style={{ fontSize: "15px" }}
                         >
-                          <div
-                            className="card h-100"
-                            style={{ width: "150px" }}
+                          Customer Name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="customerName"
+                          value={customerName}
+                          placeholder="Customer name"
+                          onChange={(e) => setCustomerName(e.target.value)}
+                        />
+                      </div>
+                      {orderType === "dineIn" && (
+                        <div className="col-12 col-md-6">
+                          <label
+                            htmlFor="tableNumber"
+                            className="form-label"
+                            style={{ fontSize: "15px" }}
                           >
-                            <span
-                              className="badge bg-primary"
+                            No. Table
+                          </label>
+                          <select
+                            className="form-select"
+                            id="tableNumber"
+                            value={tableNumber}
+                            onChange={(e) => setTableNumber(e.target.value)}
+                          >
+                            {[...Array(20)].map((_, index) => (
+                              <option key={index} value={index + 1}>
+                                Table {index + 1}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Daftar Order */}
+                  <div
+                    className="list-group-container flex-grow-1 d-flex align-items-center justify-content-center mt-3"
+                    style={{ overflowY: "auto", padding: "1rem" }}
+                  >
+                    {orders.length === 0 ? (
+                      <p className="text-muted" style={{ fontSize: "1.2rem" }}>
+                        No Menu Selected
+                      </p>
+                    ) : (
+                      <ul className="list-group w-100">
+                        {orders.map((order, index) => (
+                          <li
+                            key={index}
+                            className="list-group-item d-flex align-items-center justify-content-between"
+                            style={{
+                              gap: "15px",
+                              padding: "15px",
+                              fontSize: "10px",
+                              borderRadius: "10px",
+                              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                              backgroundColor: "#f9f9f9",
+                              position: "relative",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            <img
+                              src={order.image}
+                              alt={order.name}
                               style={{
-                                fontSize: "0.7rem",
-                                padding: "3px 8px",
-                                borderRadius: "20px",
+                                width: "50px",
+                                height: "50px",
+                                objectFit: "cover",
+                                borderRadius: "5px",
+                              }}
+                            />
+                            <div className="flex-grow-1">
+                              <strong>{order.name}</strong>
+                              <div className="d-flex align-items-center gap-2 mt-1">
+                                <button
+                                  className="btn btn-sm btn-outline-secondary"
+                                  onClick={() => handleDecreaseOrder(order.id)}
+                                  disabled={order.quantity <= 1}
+                                >
+                                  -
+                                </button>
+                                <span>{order.quantity}</span>
+                                <button
+                                  className="btn btn-sm btn-outline-secondary"
+                                  onClick={() => handleIncreaseOrder(order.id)}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                            <span style={{ color: "blue", fontWeight: "bold" }}>
+                              {formatPriceToIDR(order.price * order.quantity)}
+                            </span>
+                            <button
+                              className="btn btn-sm btn-outline-danger"
+                              style={{
                                 position: "absolute",
                                 top: "5px",
                                 right: "5px",
-                                zIndex: "10",
                               }}
+                              onClick={() => handleRemoveOrder(order.id)}
                             >
-                              {menu.category}
-                            </span>
-                            <img
-                              src={menu.image}
-                              className="card-img-top"
-                              alt={menu.name}
-                              style={{ height: "100px", objectFit: "cover" }}
-                            />
-                            <div
-                              className="card-body"
-                              style={{ padding: "10px" }}
-                            >
-                              <h6
-                                className="card-title"
-                                style={{ fontSize: "0.9rem" }}
-                              >
-                                {menu.name}
-                              </h6>
-                              <p
-                                className="card-text text-muted"
-                                style={{ fontSize: "0.8rem" }}
-                              >
-                                {menu.description}
-                              </p>
-                              <p
-                                className="card-text"
-                                style={{ fontSize: "0.9rem" }}
-                              >
-                                <span
-                                  style={{ color: "blue", fontWeight: "bold" }}
-                                >
-                                  {formatPriceToIDR(menu.price)}
-                                </span>{" "}
-                                <span style={{ color: "black" }}>/portion</span>
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div
-              className="bg-light p-4 d-flex flex-column"
-              style={{
-                width: "3080px",
-                height: "800px",
-                borderRadius: "15px", // Tambahkan border-radius untuk sudut melengkung
-                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-              }} /* Sesuaikan ukuran yang realistis */
-            >
-              <h3>List Order</h3>
-              <p
-                className="no-order"
-                style={{ fontSize: "10px", fontFamily: "sans-serif" }}
-              >
-                {"No Order"}&nbsp;{orderNumber}
-              </p>
-              <div className="mt-3 d-flex justify-content-between gap-2">
-                <button
-                  className={`btn w-50 ${
-                    orderType === "dineIn"
-                      ? "btn-primary text-white"
-                      : "btn-outline-primary"
-                  }`}
-                  onClick={() => handleOrderTypeChange("dineIn")}
-                >
-                  Dine In
-                </button>
-                <button
-                  className={`btn w-50 ${
-                    orderType === "takeAway"
-                      ? "btn-primary text-white"
-                      : "btn-outline-primary"
-                  }`}
-                  onClick={() => handleOrderTypeChange("takeAway")}
-                >
-                  Take Away
-                </button>
-              </div>
-              <div className="mt-3">
-                <div className="d-flex justify-content-between gap-3">
-                  {/* Customer Name */}
-                  <div className="w-50">
-                    <label
-                      style={{ fontSize: "15px" }}
-                      htmlFor="customerName"
-                      className="form-label"
-                    >
-                      Customer Name
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="customerName"
-                      value={customerName}
-                      placeholder="Customer name"
-                      onChange={(e) => setCustomerName(e.target.value)} // Update state
-                    />
-                  </div>
-
-                  {/* No Table */}
-                  {orderType === "dineIn" && (
-                    <div className="w-50">
-                      <label
-                        style={{ fontSize: "15px" }}
-                        htmlFor="tableNumber"
-                        className="form-label"
-                      >
-                        No. Table
-                      </label>
-                      <select
-                        className="form-select"
-                        value={tableNumber}
-                        onChange={(e) => setTableNumber(e.target.value)} // Update state
-                        id="tableNumber"
-                      >
-                        {[...Array(20)].map((_, index) => (
-                          <option key={index} value={index + 1}>
-                            Table {index + 1}
-                          </option>
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          </li>
                         ))}
-                      </select>
-                    </div>
-                  )}
-                </div>
-              </div>
+                      </ul>
+                    )}
+                  </div>
 
-              {/* Scrollable List Group */}
-              <div
-                className="list-group-container flex-grow-1 d-flex align-items-center justify-content-center"
-                style={{
-                  overflowY: "auto",
-                  marginBottom: "10px",
-                  paddingTop: "5cm",
-                  paddingLeft: "2cm", // Tambahkan padding kiri
-                  paddingRight: "2cm", // Tambahkan padding kanan
-                }}
-              >
-                {orders.length === 0 ? (
-                  <p className="text-muted" style={{ fontSize: "1.2rem" }}>
-                    No Menu Selected
-                  </p>
-                ) : (
-                  <ul className="list-group">
-                    {orders.map((order, index) => (
-                      <li
-                        key={index}
-                        className="list-group-item d-flex align-items-center justify-content-between"
-                        style={{
-                          gap: "15px", // Jarak antar-elemen dalam container
-                          height: "110px", // Tinggi card lebih besar
-                          padding: "15px", // Tambahkan padding dalam card
-                          fontSize: "10px", // Ukuran teks lebih besar
-                          borderRadius: "10px", // Tambahkan border-radius untuk tampilan lebih halus
-                          boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)", // Tambahkan bayangan
-                          backgroundColor: "#f9f9f9", // Warna latar belakang
-                        }}
-                      >
-                        <img
-                          src={order.image}
-                          alt={order}
-                          style={{
-                            width: "50px",
-                            height: "50px",
-                            objectFit: "cover",
-                            borderRadius: "5px",
-                          }}
-                        />
-                        <div className="flex-grow-1">
-                          <strong>{order.name}</strong>
-                          <div className="d-flex align-items-center gap-2 mt-1">
-                            <button
-                              className="btn btn-sm btn-outline-secondary"
-                              onClick={() => handleDecreaseOrder(order.id)}
-                              disabled={order.quantity <= 1}
-                            >
-                              -
-                            </button>
-                            <span>{order.quantity}</span>
-                            <button
-                              className="btn btn-sm btn-outline-secondary"
-                              onClick={() => handleIncreaseOrder(order.id)}
-                            >
-                              +
-                            </button>
-                          </div>
+                  {/* Ringkasan Order dan Pembayaran */}
+                  <div
+                    style={{ borderTop: "1px solid #ccc", paddingTop: "10px" }}
+                  >
+                    <div className="mt-3 d-flex justify-content-between">
+                      <strong style={{ color: "#5E5E5E" }}>Subtotal:</strong>
+                      <strong style={{ color: "#5E5E5E" }}>
+                        {formatPriceToIDR(
+                          orders.reduce(
+                            (acc, order) => acc + order.price * order.quantity,
+                            0
+                          )
+                        )}
+                      </strong>
+                    </div>
+                    <div className="mt-3 d-flex justify-content-between">
+                      <strong style={{ color: "#5E5E5E" }}>Tax (10%):</strong>
+                      <strong style={{ color: "#5E5E5E" }}>
+                        {formatPriceToIDR(
+                          orders.reduce(
+                            (acc, order) => acc + order.price * order.quantity,
+                            0
+                          ) * 0.1
+                        )}
+                      </strong>
+                    </div>
+                    <hr
+                      style={{ border: "1px solid #ccc", margin: "15px 0" }}
+                    />
+                    <div className="mt-3 d-flex justify-content-between">
+                      <strong>Total:</strong>
+                      <strong style={{ color: "black" }}>
+                        {formatPriceToIDR(total)}
+                      </strong>
+                    </div>
+
+                    {orders.length > 0 && (
+                      <>
+                        <div className="mt-3 d-flex gap-2 justify-content-center">
+                          <button
+                            className="btn btn-outline-secondary"
+                            onClick={() => setPaymentNominal(50000)}
+                          >
+                            50.000
+                          </button>
+                          <button
+                            className="btn btn-outline-secondary"
+                            onClick={() => setPaymentNominal(75000)}
+                          >
+                            75.000
+                          </button>
+                          <button
+                            className="btn btn-outline-secondary"
+                            onClick={() => setPaymentNominal(100000)}
+                          >
+                            100.000
+                          </button>
                         </div>
-                        {/* Tampilkan harga total dengan format Rupiah */}
-                        <span style={{ color: "blue", fontWeight: "bold" }}>
-                          {formatPriceToIDR(order.price * order.quantity)}
-                        </span>
+                        <div className="mt-4">
+                          <label
+                            htmlFor="paymentInput"
+                            style={{ fontSize: "14px", fontWeight: "bold" }}
+                          >
+                            Enter Nominal Here:
+                          </label>
+                          <input
+                            type="number"
+                            id="paymentInput"
+                            className="form-control mt-2"
+                            placeholder="Enter nominal here..."
+                            value={paymentNominal}
+                            onChange={(e) =>
+                              setPaymentNominal(Number(e.target.value))
+                            }
+                          />
+                        </div>
                         <button
-                          className="btn btn-sm btn-outline-danger position-absolute"
-                          onClick={() => handleRemoveOrder(order.id)}
-                          style={{ top: "5px", right: "5px" }}
+                          className="btn btn-primary w-100 mt-4"
+                          onClick={handlePayment}
+                          disabled={paymentNominal < total}
                         >
-                          <i className="bi bi-trash"></i> {/* Icon Trash */}
+                          Pay
                         </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              {/* Fixed Footer Section */}
-              <div style={{ borderTop: "1px solid #ccc", paddingTop: "10px" }}>
-                <div className="mt-3 d-flex justify-content-between">
-                  <strong style={{ color: "#5E5E5E" }}>Subtotal:</strong>
-                  <strong style={{ color: "#5E5E5E" }}>
-                    {formatPriceToIDR(
-                      orders.reduce(
-                        (acc, order) => acc + order.price * order.quantity,
-                        0
-                      )
+                      </>
                     )}
-                  </strong>
+                  </div>
                 </div>
-                <div className="mt-3 d-flex justify-content-between">
-                  <strong style={{ color: "#5E5E5E" }}>Tax (10%):</strong>
-                  <strong style={{ color: "#5E5E5E" }}>
-                    {formatPriceToIDR(
-                      orders.reduce(
-                        (acc, order) => acc + order.price * order.quantity,
-                        0
-                      ) * 0.1
-                    )}
-                  </strong>
-                </div>
-
-                {/* Garis pembatas antara Tax dan Total */}
-                <hr style={{ border: "1px solid #ccc", margin: "15px 0" }} />
-
-                <div className="mt-3 d-flex justify-content-between">
-                  <strong>Total:</strong>
-                  <strong style={{ color: "black" }}>
-                    {formatPriceToIDR(total)}
-                  </strong>
-                </div>
-
-                {/* Tampilkan form nominal hanya jika ada pesanan */}
-                {orders.length > 0 && (
-                  <>
-                    {/* Tombol Select Nominal */}
-                    <div
-                      className="mt-3 d-flex gap-2"
-                      style={{ justifyContent: "center" }}
-                    >
-                      <button
-                        className="btn btn-outline-secondary"
-                        onClick={() => setPaymentNominal(50000)}
-                      >
-                        50.000
-                      </button>
-                      <button
-                        className="btn btn-outline-secondary"
-                        onClick={() => setPaymentNominal(75000)}
-                      >
-                        75.000
-                      </button>
-                      <button
-                        className="btn btn-outline-secondary"
-                        onClick={() => setPaymentNominal(100000)}
-                      >
-                        100.000
-                      </button>
-                    </div>
-
-                    {/* Form Input Nominal */}
-                    <div className="mt-4">
-                      <label
-                        htmlFor="paymentInput"
-                        style={{ fontSize: "14px", fontWeight: "bold" }}
-                      >
-                        Enter Nominal Here:
-                      </label>
-                      <input
-                        type="number"
-                        id="paymentInput"
-                        className="form-control mt-2"
-                        placeholder="Enter nominal here..."
-                        value={paymentNominal}
-                        onChange={(e) =>
-                          setPaymentNominal(Number(e.target.value))
-                        }
-                      />
-                    </div>
-
-                    {/* Tombol Pay */}
-                    <button
-                      className="btn btn-primary w-100 mt-4"
-                      onClick={handlePayment}
-                      disabled={paymentNominal < total} // Nonaktifkan jika nominal kurang dari total
-                    >
-                      Pay
-                    </button>
-                  </>
-                )}
               </div>
             </div>
           </div>
         </div>
       </div>
+
       {/* Modal Success Payment */}
       {showSuccessModal && (
         <div
           className="modal"
-          style={{
-            display: "block",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-          }}
+          style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}
         >
           <div
             className="modal-dialog"
@@ -670,7 +660,6 @@ const CashierDashboard = () => {
                 </button>
               </div>
               <div className="modal-body">
-                {/* Informasi Utama */}
                 <p>
                   <strong>No Order:</strong> {orderNumber}
                 </p>
@@ -690,10 +679,7 @@ const CashierDashboard = () => {
                     <strong>Table:</strong> {tableNumber}
                   </p>
                 )}
-
                 <hr />
-
-                {/* Daftar Pesanan */}
                 {orders.map((order, index) => (
                   <div key={index} className="d-flex justify-content-between">
                     <span>
@@ -704,10 +690,7 @@ const CashierDashboard = () => {
                     </span>
                   </div>
                 ))}
-
                 <hr />
-
-                {/* Subtotal, Tax, dan Total */}
                 <div className="d-flex justify-content-between">
                   <strong>Sub Total:</strong>
                   <span>{formatPriceToIDR(subtotal)}</span>
@@ -723,8 +706,6 @@ const CashierDashboard = () => {
                     {formatPriceToIDR(subtotal + tax)}
                   </strong>
                 </div>
-
-                {/* Diterima dan Kembalian */}
                 <div className="d-flex justify-content-between mt-3">
                   <strong>Diterima:</strong>
                   <span>{formatPriceToIDR(receivedAmount)}</span>
@@ -750,17 +731,14 @@ const CashierDashboard = () => {
         </div>
       )}
 
-      {/* Modal */}
+      {/* Modal Order (Input Catatan) */}
       {showModal && selectedMenu && (
         <div
           className="modal"
-          style={{
-            display: "block",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-          }}
+          style={{ display: "block", backgroundColor: "rgba(0, 0, 0, 0.5)" }}
         >
           <div
-            className="modal-dialog "
+            className="modal-dialog"
             style={{ maxWidth: "500px", margin: "10% auto" }}
           >
             <div className="modal-content">
@@ -791,7 +769,7 @@ const CashierDashboard = () => {
                 />
                 <p>{selectedMenu.description}</p>
                 <p>
-                  <strong>Price:</strong> {selectedMenu.price}
+                  <strong>Price:</strong> {formatPriceToIDR(selectedMenu.price)}
                 </p>
                 <div className="mb-3">
                   <label htmlFor="note" className="form-label">
