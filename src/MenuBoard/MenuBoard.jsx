@@ -85,7 +85,7 @@ const MenuBoard = () => {
     setTimeout(() => {
       setNotification("");
       fetchMenus(); // Refresh data after notification closed
-    }, 3000);
+    }, 1000);
   };
 
   return (
