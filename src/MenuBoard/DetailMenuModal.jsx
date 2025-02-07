@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // Base URL untuk backend, sesuaikan dengan URL tempat server Anda berjalan
-const BASE_URL = "https://backend-pos-rho.vercel.app";
+const BASE_URL = "  ";
 
 const DetailMenuModal = ({ menu, onClose, onSave, onDelete }) => {
   const [menuData, setMenuData] = useState({

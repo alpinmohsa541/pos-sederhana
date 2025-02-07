@@ -27,6 +27,9 @@ const CashierDashboard = () => {
   const [tax, setTax] = useState(0);
   const [receivedAmount, setReceivedAmount] = useState(0);
   const [changeAmount, setChangeAmount] = useState(0);
+  const [menus, setMenus] = useState([]); // State untuk menyimpan data menu
+
+  const BASE_URL = "https://backend-pos-rho.vercel.app"; // Ganti dengan base URL backend Anda
 
   useEffect(() => {
     // Ambil data pengguna dari localStorage
@@ -39,12 +42,32 @@ const CashierDashboard = () => {
     }
   }, [navigate]);
 
+  useEffect(() => {
+    // Fetch data menu dari API
+    const fetchMenus = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/menus`);
+        const data = await response.json();
+        if (response.ok) {
+          setMenus(data); // Menyimpan data menu yang di-fetch ke state menus
+        } else {
+          console.error("Failed to fetch menus:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching menus:", error);
+      }
+    };
+
+    fetchMenus();
+  }, []); // Mengambil data menu saat komponen pertama kali dirender
+
   const handleLogout = () => {
     localStorage.removeItem("user"); // Hapus data pengguna
     setIsLoggedIn(false);
     setUsername(null);
     navigate("/"); // Redirect ke halaman login
   };
+
   const generateOrderNumber = () => {
     const randomNum = Math.floor(Math.random() * 1000000000);
     return `ORDR#${randomNum}`;
@@ -188,15 +211,14 @@ const CashierDashboard = () => {
 
   const filteredMenu =
     activeButton === "All Menu"
-      ? menuData.filter((menu) =>
+      ? menus.filter((menu) =>
           menu.name.toLowerCase().includes(searchQuery.toLowerCase())
         )
-      : menuData
+      : menus
           .filter((menu) => menu.category === activeButton)
           .filter((menu) =>
             menu.name.toLowerCase().includes(searchQuery.toLowerCase())
           );
-
   return (
     <div className="main-content cashier-dashboard container-fluid p-0">
       <div className="row g-0">
