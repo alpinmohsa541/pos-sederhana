@@ -57,7 +57,7 @@ function LoginForm() {
 
   return (
     <div
-      className="login-container d-flex align-items-center vh-100"
+      className="login-container d-flex justify-content-center align-items-center vh-100"
       style={{
         backgroundImage: "url(/assets/cover-bg.png)",
         backgroundSize: "cover",
@@ -65,8 +65,8 @@ function LoginForm() {
       }}
     >
       <div
-        className="card shadow"
-        style={{ marginLeft: "20%", maxWidth: "400px", borderRadius: "15px" }}
+        className="card shadow col-12 col-md-6 col-lg-4"
+        style={{ borderRadius: "15px" }}
       >
         <div className="card-body p-4">
           <div className="text-center mb-4">
