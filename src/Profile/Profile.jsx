@@ -4,7 +4,7 @@ import Sidebar from "../Sidebar/Sidebar";
 import Navbar from "../Navbar/Navbar";
 
 const Profile = () => {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(""); // Ini bisa diganti menjadi objek untuk konsistensi
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState({
     name: "",
@@ -18,13 +18,13 @@ const Profile = () => {
   const navigate = useNavigate();
 
   // Ambil data dari localStorage saat komponen dimuat
-
   useEffect(() => {
     // Simulasi autentikasi pengguna
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
-      setUsername(storedUser);
+      setUser(storedUser);
       setIsLoggedIn(true);
+      setUsername(storedUser.name); // Simpan nama user dari localStorage
     } else {
       navigate("/"); // Redirect ke login jika belum login
     }
@@ -33,7 +33,7 @@ const Profile = () => {
   const handleLogout = () => {
     localStorage.removeItem("user"); // Hapus data pengguna
     setIsLoggedIn(false);
-    setUsername(null);
+    setUsername("");
     navigate("/"); // Redirect ke halaman login
   };
 
@@ -72,7 +72,7 @@ const Profile = () => {
             {/* Account Section */}
             <h5>Account</h5>
             <div className="row mb-3 align-items-center">
-              <div className="col-md-3 d-flex flex-column align-items-center">
+              <div className="col-12 col-md-3 d-flex flex-column align-items-center">
                 <img
                   src="/assets/profile.svg"
                   alt="profile"
@@ -85,7 +85,7 @@ const Profile = () => {
                   }}
                 />
               </div>
-              <div className="col-md-9 d-flex flex-column justify-content-center">
+              <div className="col-12 col-md-9 d-flex flex-column justify-content-center">
                 <div className="d-flex">
                   <button className="btn btn-primary btn-sm me-2">
                     Change Picture
@@ -97,7 +97,7 @@ const Profile = () => {
               </div>
             </div>
             <div className="row">
-              <div className="col-md-6 mb-3">
+              <div className="col-12 col-md-6 mb-3">
                 <label className="form-label">Email</label>
                 <input
                   type="email"
@@ -108,7 +108,7 @@ const Profile = () => {
                   }
                 />
               </div>
-              <div className="col-md-6 mb-3">
+              <div className="col-12 col-md-6 mb-3">
                 <label className="form-label">Username</label>
                 <input
                   type="text"
@@ -119,7 +119,7 @@ const Profile = () => {
                   }
                 />
               </div>
-              <div className="col-md-6 mb-3">
+              <div className="col-12 col-md-6 mb-3">
                 <label className="form-label">Role</label>
                 <input
                   type="text"
@@ -143,7 +143,7 @@ const Profile = () => {
             {/* Appearance Section */}
             <h5>Appearance</h5>
             <div className="row">
-              <div className="col-md-4 mb-3">
+              <div className="col-12 col-md-4 mb-3">
                 <label className="form-label">Preference Mode</label>
                 <select
                   className="form-select"
@@ -154,7 +154,7 @@ const Profile = () => {
                   <option>Dark Mode</option>
                 </select>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-12 col-md-4 mb-3">
                 <label className="form-label">Font Size</label>
                 <select
                   className="form-select"
@@ -166,7 +166,7 @@ const Profile = () => {
                   <option>18 px</option>
                 </select>
               </div>
-              <div className="col-md-4 mb-3">
+              <div className="col-12 col-md-4 mb-3">
                 <label className="form-label">Zoom Display</label>
                 <select
                   className="form-select"

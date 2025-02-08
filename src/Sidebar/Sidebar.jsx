@@ -52,7 +52,7 @@ const Sidebar = () => {
 
   return (
     <div
-      className="sidebar bg-light vh-100 d-flex flex-column align-items-center p-3 position-fixed"
+      className="sidebar bg-light vh-100 d-flex flex-column align-items-center p-3 position-fixed d-none d-md-flex"
       style={{
         width: "80px", // Lebar tetap
         top: 0, // Tetap di atas
@@ -77,17 +77,14 @@ const Sidebar = () => {
       {icons.map((icon, index) => (
         <div
           key={index}
-          className={`icon-item mb-4 ${
-            location.pathname === icon.path ? "active-icon" : ""
-          }`}
+          className={`icon-item mb-4 ${location.pathname === icon.path ? "active-icon" : ""}`}
           style={{
             width: "50px",
             height: "50px",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            border:
-              location.pathname === icon.path ? "2px solid #3572EF" : "none",
+            border: location.pathname === icon.path ? "2px solid #3572EF" : "none",
             borderRadius: "10px",
             transition: "all 0.3s ease", // Animasi transisi untuk efek hover dan aktif
           }}
@@ -107,8 +104,7 @@ const Sidebar = () => {
               style={{
                 maxWidth: "30px",
                 maxHeight: "30px",
-                filter:
-                  location.pathname === icon.path ? "none" : "grayscale(100%)",
+                filter: location.pathname === icon.path ? "none" : "grayscale(100%)",
                 transition: "filter 0.3s ease", // Animasi transisi untuk hover
               }}
             />
