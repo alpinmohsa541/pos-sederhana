@@ -18,22 +18,33 @@ function App() {
       <Routes>
         {/* Route untuk halaman Login */}
         <Route path="/" element={<Login />} />
+        
         {/* Route untuk halaman cashier dashboard */}
         <Route path="/cashier-dashboard" element={<CashierDashboard />} />
+        
         {/* Route untuk halaman Register */}
         <Route path="/register" element={<Register />} />
+        
         {/* Route untuk halaman email to reset password */}
         <Route path="/reset" element={<Reset />} />
+        
         {/* Route untuk halaman reset password */}
         <Route path="/reset-password" element={<ResetPassword />} />
+        
         {/* Route untuk halaman Sales Report */}
         <Route path="/sales-report" element={<SalesReport />} />
+        
         {/* Route untuk halaman Profile */}
         <Route path="/profile" element={<Profile />} />
+        
         {/* Route untuk halaman dashboard */}
         <Route path="/dashboard" element={<Dashboard />} />
+        
         {/* Route untuk halaman Menu board */}
-        <Route path="/menu-board" element={<MenuBoard />} />{" "}
+        <Route path="/menu-board" element={<MenuBoard />} />
+        
+        {/* Route untuk halaman 404 - Not Found */}
+        <Route path="*" element={<h2>Page Not Found</h2>} />
       </Routes>
     </Router>
   );
