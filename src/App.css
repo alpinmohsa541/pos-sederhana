@@ -156,3 +156,18 @@ div[title="Shop"]:hover img {
   font-size: 1.5rem;
   cursor: pointer;
 }
+/* App.css or a dedicated CSS file */
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+.fade-exit {
+  opacity: 1;
+}
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-out;
+}
