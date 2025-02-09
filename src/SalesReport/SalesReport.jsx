@@ -83,6 +83,27 @@ const SalesReport = () => {
     });
   };
 
+  // Fetch orders (transaction groups) from the new API
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/api/transaction-groups`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setOrders(data); // Set the fetched transaction data
+        } else {
+          console.error("Failed to fetch transactions:", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchOrders(); // Fetch orders when the component mounts
+  }, []);
+
+
   // Update tanggal setiap detik
   useEffect(() => {
     const updateDate = () => {
@@ -448,11 +469,11 @@ const SalesReport = () => {
                       onClick={() => handleTransactionModalOpen(order)}
                       style={{ cursor: "pointer" }}
                     >
-                      <td>{order.noOrder}</td>
-                      <td>{order.orderDate}</td>
-                      <td>{order.orderType}</td>
+                      <td>{order.order_number}</td>
+                      <td>{order.created_at}</td>
+                      <td>{order.transaction_type}</td>
                       <td>{order.category}</td>
-                      <td>{order.customerName}</td>
+                      <td>{order.customer_name}</td>
                       <td>
                         <button
                           onClick={(e) => {

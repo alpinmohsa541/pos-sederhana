@@ -1,8 +1,10 @@
 import "../App.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../Navbar/Navbar"; // Import komponen Navbar
-import Sidebar from "../Sidebar/Sidebar"; // Import komponen Sidebar
+import Navbar from "../Navbar/Navbar";
+import Sidebar from "../Sidebar/Sidebar";
+import { ToastContainer,Toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CashierDashboard = () => {
   // State untuk autentikasi dan user
@@ -34,65 +36,98 @@ const CashierDashboard = () => {
 
   const BASE_URL = "https://backend-pos-rho.vercel.app"; // Base URL backend
 
-// Generate nomor order secara acak
-const generateOrderNumber = () => {
-  const randomNum = Math.floor(Math.random() * 1000000000);
-  return `ORDR#${randomNum}`;
-};
+  // Generate nomor order secara acak
+  const generateOrderNumber = () => {
+    const randomNum = Math.floor(Math.random() * 1000000000);
+    return `ORDR#${randomNum}`;
+  };
 
-// Fungsi untuk memproses pembayaran
-const handlePayment = () => {
-  if (paymentNominal >= total) {
-    const calculatedSubtotal = orders.reduce(
-      (acc, order) => acc + order.price * order.quantity,
-      0
-    );
-    const calculatedTax = calculatedSubtotal * 0.1; // Pajak 10%
-    const calculatedTotal = calculatedSubtotal + calculatedTax;
-    const calculatedChange = paymentNominal - calculatedTotal;
+  // Fungsi untuk memproses pembayaran dan mengirim data transaksi ke API
+  const handlePayment = async () => {
+    if (paymentNominal >= total) {
+      const calculatedSubtotal = orders.reduce(
+        (acc, order) => acc + order.price * order.quantity,
+        0
+      );
+      const calculatedTax = calculatedSubtotal * 0.1; // Pajak 10%
+      const calculatedTotal = calculatedSubtotal + calculatedTax;
+      const calculatedChange = paymentNominal - calculatedTotal;
 
-    setSubtotal(calculatedSubtotal);
-    setTax(calculatedTax);
-    setReceivedAmount(paymentNominal);
-    setChangeAmount(calculatedChange);
+      setSubtotal(calculatedSubtotal);
+      setTax(calculatedTax);
+      setReceivedAmount(paymentNominal);
+      setChangeAmount(calculatedChange);
 
-    // Set nomor order hanya setelah pembayaran berhasil
-    const generatedOrderNumber = generateOrderNumber();
-    setOrderNumber(generatedOrderNumber); // Set nomor order hanya setelah sukses payment
+      // Set nomor order hanya setelah pembayaran berhasil
+      const generatedOrderNumber = generateOrderNumber();
+      setOrderNumber(generatedOrderNumber); // Set nomor order hanya setelah sukses payment
 
-    setShowSuccessModal(true);
+      setShowSuccessModal(true);
 
-    // Reset order dan input nominal
-    setOrders([]); // Reset daftar pesanan
-    setPaymentNominal(0); // Reset input nominal
-    setTotal(0); // Reset total harga
-  } else {
-    alert("Insufficient payment!");
-  }
-};
+      // Reset order dan input nominal
+      setOrders([]); // Reset daftar pesanan
+      setPaymentNominal(0); // Reset input nominal
+      setTotal(0); // Reset total harga
 
-// Tambahkan order ke dalam daftar order
-const handleAddOrder = (newOrder) => {
-  const existingOrder = orders.find((order) => order.name === newOrder.name);
+      // Kirim data transaksi ke backend
+      const transactionData = {
+        user_id: "60d9f9b9e0bace0040dfd024", // Ganti dengan user_id yang sesuai
+        order_number: generatedOrderNumber,
+        transaction_type: orderType,
+        customer_name: customerName,
+        table: tableNumber,
+        subtotal_group: calculatedSubtotal,
+        tax: calculatedTax,
+        total: calculatedTotal,
+        status: "Paid",
+        cash: paymentNominal,
+        cashback: calculatedChange,
+      };
 
-  if (existingOrder) {
-    // Jika menu sudah ada, tambah kuantitasnya
-    setOrders(
-      orders.map((order) =>
-        order.name === newOrder.name
-          ? { ...order, quantity: order.quantity + 1 }
-          : order
-      )
-    );
-  } else {
-    // Jika menu baru, tambah ke daftar orders
-    setOrders([
-      ...orders,
-      { ...newOrder, quantity: 1, price: newOrder.price || 0 },
-    ]);
-  }
-};
+      try {
+        const response = await fetch(`${BASE_URL}/api/transaction-groups`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(transactionData),
+        });
 
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Transaction saved successfully:", data);
+        } else {
+          console.error("Error saving transaction:", response.status);
+        }
+      } catch (error) {
+        console.error("Error sending transaction data:", error);
+      }
+    } else {
+      alert("Insufficient payment!");
+    }
+  };
+
+  // Tambahkan order ke dalam daftar order
+  const handleAddOrder = (newOrder) => {
+    const existingOrder = orders.find((order) => order.name === newOrder.name);
+
+    if (existingOrder) {
+      // Jika menu sudah ada, tambah kuantitasnya
+      setOrders(
+        orders.map((order) =>
+          order.name === newOrder.name
+            ? { ...order, quantity: order.quantity + 1 }
+            : order
+        )
+      );
+    } else {
+      // Jika menu baru, tambah ke daftar orders
+      setOrders([
+        ...orders,
+        { ...newOrder, quantity: 1, price: newOrder.price || 0 },
+      ]);
+    }
+  };
 
   // Ambil data user dari localStorage saat komponen pertama kali dirender
   useEffect(() => {
@@ -157,8 +192,6 @@ const handleAddOrder = (newOrder) => {
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
-
-
 
   // Fungsi untuk menambah kuantitas order
   const handleIncreaseOrder = (orderId) => {
@@ -251,6 +284,7 @@ const handleAddOrder = (newOrder) => {
 
         <div className="col-12 col-lg-11">
           <Navbar
+            isLogged
             isLoggedIn={isLoggedIn}
             username={username}
             searchQuery={searchQuery}
@@ -319,230 +353,231 @@ const handleAddOrder = (newOrder) => {
 
               {/* Section Order */}
               <div className="col-12 col-lg-4">
-  <div
-    className="bg-light p-4 d-flex flex-column h-100"
-    style={{
-      borderRadius: "15px",
-      boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-    }}
-  >
-    <h3>List Order</h3>
-    <p className="no-order" style={{ fontSize: "10px", fontFamily: "sans-serif" }}>
-      No Order: {orderNumber}
-    </p>
-    <div className="mt-3 d-flex justify-content-between gap-2">
-      <button
-        className={`btn w-50 ${orderType === "dineIn" ? "btn-primary text-white" : "btn-outline-primary"}`}
-        onClick={() => handleOrderTypeChange("dineIn")}
-      >
-        Dine In
-      </button>
-      <button
-        className={`btn w-50 ${orderType === "takeAway" ? "btn-primary text-white" : "btn-outline-primary"}`}
-        onClick={() => handleOrderTypeChange("takeAway")}
-      >
-        Take Away
-      </button>
-    </div>
-    <div className="mt-3">
-      <div className="row g-2">
-        <div className="col-12 col-md-6">
-          <label htmlFor="customerName" className="form-label" style={{ fontSize: "15px" }}>
-            Customer Name
-          </label>
-          <input
-            type="text"
-            className="form-control"
-            id="customerName"
-            value={customerName}
-            placeholder="Customer name"
-            onChange={(e) => setCustomerName(e.target.value)}
-          />
-        </div>
-        {orderType === "dineIn" && (
-          <div className="col-12 col-md-6">
-            <label htmlFor="tableNumber" className="form-label" style={{ fontSize: "15px" }}>
-              No. Table
-            </label>
-            <select
-              className="form-select"
-              id="tableNumber"
-              value={tableNumber}
-              onChange={(e) => setTableNumber(e.target.value)}
-            >
-              {[...Array(20)].map((_, index) => (
-                <option key={index} value={index + 1}>
-                  Table {index + 1}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-      </div>
-    </div>
+                <div
+                  className="bg-light p-4 d-flex flex-column h-100"
+                  style={{
+                    borderRadius: "15px",
+                    boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                  }}
+                >
+                  <h3>List Order</h3>
+                  <p className="no-order" style={{ fontSize: "10px", fontFamily: "sans-serif" }}>
+                    No Order: {orderNumber}
+                  </p>
+                  <div className="mt-3 d-flex justify-content-between gap-2">
+                    <button
+                      className={`btn w-50 ${orderType === "dineIn" ? "btn-primary text-white" : "btn-outline-primary"}`}
+                      onClick={() => handleOrderTypeChange("dineIn")}
+                    >
+                      Dine In
+                    </button>
+                    <button
+                      className={`btn w-50 ${orderType === "takeAway" ? "btn-primary text-white" : "btn-outline-primary"}`}
+                      onClick={() => handleOrderTypeChange("takeAway")}
+                    >
+                      Take Away
+                    </button>
+                  </div>
+                  <div className="mt-3">
+                    <div className="row g-2">
+                      <div className="col-12 col-md-6">
+                        <label htmlFor="customerName" className="form-label" style={{ fontSize: "15px" }}>
+                          Customer Name
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="customerName"
+                          value={customerName}
+                          placeholder="Customer name"
+                          onChange={(e) => setCustomerName(e.target.value)}
+                        />
+                      </div>
+                      {orderType === "dineIn" && (
+                        <div className="col-12 col-md-6">
+                          <label htmlFor="tableNumber" className="form-label" style={{ fontSize: "15px" }}>
+                            No. Table
+                          </label>
+                          <select
+                            className="form-select"
+                            id="tableNumber"
+                            value={tableNumber}
+                            onChange={(e) => setTableNumber(e.target.value)}
+                          >
+                            {[...Array(20)].map((_, index) => (
+                              <option key={index} value={index + 1}>
+                                Table {index + 1}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-    {/* Daftar Order dengan scroll jika lebih dari 3 menu berbeda */}
-    <div
-      className="list-group-container flex-grow-1 d-flex align-items-center justify-content-center mt-3"
-      style={{
-        overflowY: "auto",
-        padding: "1rem",
-        maxHeight: "300px", // Menambahkan batasan tinggi untuk scroll
-      }}
-    >
-      {orders.length === 0 ? (
-        <p className="text-muted" style={{ fontSize: "1.2rem" }}>
-          No Menu Selected
-        </p>
-      ) : (
-        <ul className="list-group w-100">
-          {orders.map((order, index) => (
-            <li
-              key={index}
-              className="list-group-item d-flex align-items-center justify-content-between"
-              style={{
-                gap: "15px",
-                padding: "15px",
-                fontSize: "15 px",
-                borderRadius: "10px",
-                boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
-                backgroundColor: "#f9f9f9",
-                position: "relative",
-                marginBottom: "10px",
-              }}
-            >
-              <img
-                src={order.image}
-                alt={order.name}
-                style={{
-                  width: "50px",
-                  height: "50px",
-                  objectFit: "cover",
-                  borderRadius: "5px",
-                }}
-              />
-              <div className="flex-grow-1">
-                <strong>{order.name}</strong>
-                <div className="d-flex align-items-center gap-2 mt-1">
-                  <button
-                    className="btn btn-sm btn-outline-secondary"
-                    onClick={() => handleDecreaseOrder(order.id)}
-                    disabled={order.quantity <= 1}
+                  {/* Daftar Order dengan scroll jika lebih dari 3 menu berbeda */}
+                  <div
+                    className="list-group-container flex-grow-1 d-flex align-items-center justify-content-center mt-3"
+                    style={{
+                      overflowY: "auto",
+                      padding: "1rem",
+                      maxHeight: "300px", // Menambahkan batasan tinggi untuk scroll
+                    }}
                   >
-                    -
-                  </button>
-                  <span>{order.quantity}</span>
-                  <button
-                    className="btn btn-sm btn-outline-secondary"
-                    onClick={() => handleIncreaseOrder(order.id)}
-                  >
-                    +
-                  </button>
+                    {orders.length === 0 ? (
+                      <p className="text-muted" style={{ fontSize: "1.2rem" }}>
+                        No Menu Selected
+                      </p>
+                    ) : (
+                      <ul className="list-group w-100">
+                        {orders.map((order, index) => (
+                          <li
+                            key={index}
+                            className="list-group-item d-flex align-items-center justify-content-between"
+                            style={{
+                              gap: "15px",
+                              padding: "15px",
+                              fontSize: "15 px",
+                              borderRadius: "10px",
+                              boxShadow: "0px 4px 8px rgba(0, 0, 0, 0.1)",
+                              backgroundColor: "#f9f9f9",
+                              position: "relative",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            <img
+                              src={order.image}
+                              alt={order.name}
+                              style={{
+                                width: "50px",
+                                height: "50px",
+                                objectFit: "cover",
+                                borderRadius: "5px",
+                              }}
+                            />
+                            <div className="flex-grow-1">
+                              <strong>{order.name}</strong>
+                              <div className="d-flex align-items-center gap-2 mt-1">
+                                <button
+                                  className="btn btn-sm btn-outline-secondary"
+                                  onClick={() => handleDecreaseOrder(order.id)}
+                                  disabled={order.quantity <= 1}
+                                >
+                                  -
+                                </button>
+                                <span>{order.quantity}</span>
+                                <button
+                                  className="btn btn-sm btn-outline-secondary"
+                                  onClick={() => handleIncreaseOrder(order.id)}
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </div>
+                            <span style={{ color: "blue", fontWeight: "bold" }}>
+                              {formatPriceToIDR(order.price * order.quantity)}
+                            </span>
+                            <button
+                              className="btn btn-sm btn-outline-danger"
+                              style={{
+                                position: "absolute",
+                                top: "5px",
+                                right: "5px",
+                              }}
+                              onClick={() => handleRemoveOrder(order.id)}
+                            >
+                              <i className="bi bi-trash"></i>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Ringkasan Order dan Pembayaran */}
+                  <div style={{ borderTop: "1px solid #ccc", paddingTop: "10px" }}>
+                    <div className="mt-3 d-flex justify-content-between">
+                      <strong style={{ color: "#5E5E5E" }}>Subtotal:</strong>
+                      <strong style={{ color: "#5E5E5E" }}>
+                        {formatPriceToIDR(
+                          orders.reduce(
+                            (acc, order) => acc + order.price * order.quantity,
+                            0
+                          )
+                        )}
+                      </strong>
+                    </div>
+                    <div className="mt-3 d-flex justify-content-between">
+                      <strong style={{ color: "#5E5E5E" }}>Tax (10%):</strong>
+                      <strong style={{ color: "#5E5E5E" }}>
+                        {formatPriceToIDR(
+                          orders.reduce(
+                            (acc, order) => acc + order.price * order.quantity,
+                            0
+                          ) * 0.1
+                        )}
+                      </strong>
+                    </div>
+                    <hr style={{ border: "1px solid #ccc", margin: "15px 0" }} />
+                    <div className="mt-3 d-flex justify-content-between">
+                      <strong>Total:</strong>
+                      <strong style={{ color: "black" }}>
+                        {formatPriceToIDR(total)}
+                      </strong>
+                    </div>
+
+                    {orders.length > 0 && (
+                      <>
+                        <div className="mt-3 d-flex gap-2 justify-content-center">
+                          <button
+                            className="btn btn-outline-secondary"
+                            onClick={() => setPaymentNominal(50000)}
+                          >
+                            50.000
+                          </button>
+                          <button
+                            className="btn btn-outline-secondary"
+                            onClick={() => setPaymentNominal(75000)}
+                          >
+                            75.000
+                          </button>
+                          <button
+                            className="btn btn-outline-secondary"
+                            onClick={() => setPaymentNominal(100000)}
+                          >
+                            100.000
+                          </button>
+                        </div>
+                        <div className="mt-4">
+                          <label
+                            htmlFor="paymentInput"
+                            style={{ fontSize: "14px", fontWeight: "bold" }}
+                          >
+                            Enter Nominal Here:
+                          </label>
+                          <input
+                            type="number"
+                            id="paymentInput"
+                            className="form-control mt-2"
+                            placeholder="Enter nominal here..."
+                            value={paymentNominal}
+                            onChange={(e) =>
+                              setPaymentNominal(Number(e.target.value))
+                            }
+                          />
+                        </div>
+                        <button
+                          className="btn btn-primary w-100 mt-4"
+                          onClick={handlePayment}
+                          disabled={paymentNominal < total}
+                        >
+                          Pay
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-              <span style={{ color: "blue", fontWeight: "bold" }}>
-                {formatPriceToIDR(order.price * order.quantity)}
-              </span>
-              <button
-                className="btn btn-sm btn-outline-danger"
-                style={{
-                  position: "absolute",
-                  top: "5px",
-                  right: "5px",
-                }}
-                onClick={() => handleRemoveOrder(order.id)}
-              >
-                <i className="bi bi-trash"></i>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-
-    {/* Ringkasan Order dan Pembayaran */}
-    <div style={{ borderTop: "1px solid #ccc", paddingTop: "10px" }}>
-      <div className="mt-3 d-flex justify-content-between">
-        <strong style={{ color: "#5E5E5E" }}>Subtotal:</strong>
-        <strong style={{ color: "#5E5E5E" }}>
-          {formatPriceToIDR(
-            orders.reduce(
-              (acc, order) => acc + order.price * order.quantity,
-              0
-            )
-          )}
-        </strong>
-      </div>
-      <div className="mt-3 d-flex justify-content-between">
-        <strong style={{ color: "#5E5E5E" }}>Tax (10%):</strong>
-        <strong style={{ color: "#5E5E5E" }}>
-          {formatPriceToIDR(
-            orders.reduce(
-              (acc, order) => acc + order.price * order.quantity,
-              0
-            ) * 0.1
-          )}
-        </strong>
-      </div>
-      <hr style={{ border: "1px solid #ccc", margin: "15px 0" }} />
-      <div className="mt-3 d-flex justify-content-between">
-        <strong>Total:</strong>
-        <strong style={{ color: "black" }}>
-          {formatPriceToIDR(total)}
-        </strong>
-      </div>
-
-      {orders.length > 0 && (
-        <>
-          <div className="mt-3 d-flex gap-2 justify-content-center">
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => setPaymentNominal(50000)}
-            >
-              50.000
-            </button>
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => setPaymentNominal(75000)}
-            >
-              75.000
-            </button>
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => setPaymentNominal(100000)}
-            >
-              100.000
-            </button>
-          </div>
-          <div className="mt-4">
-            <label
-              htmlFor="paymentInput"
-              style={{ fontSize: "14px", fontWeight: "bold" }}
-            >
-              Enter Nominal Here:
-            </label>
-            <input
-              type="number"
-              id="paymentInput"
-              className="form-control mt-2"
-              placeholder="Enter nominal here..."
-              value={paymentNominal}
-              onChange={(e) => setPaymentNominal(Number(e.target.value))}
-            />
-          </div>
-          <button
-            className="btn btn-primary w-100 mt-4"
-            onClick={handlePayment}
-            disabled={paymentNominal < total}
-          >
-            Pay
-          </button>
-        </>
-      )}
-    </div>
-  </div>
-</div>
-
             </div>
           </div>
         </div>
@@ -716,6 +751,8 @@ const handleAddOrder = (newOrder) => {
                   >
                     Submit to Order
                   </button>
+                  {/* Toast Container */}
+                 <ToastContainer /> {/* React Toastify notification container */}
                 </div>
               </div>
             </div>
@@ -727,4 +764,3 @@ const handleAddOrder = (newOrder) => {
 };
 
 export default CashierDashboard;
-
