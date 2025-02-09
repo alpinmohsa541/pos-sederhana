@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { CSSTransition } from "react-transition-group"; // Import CSSTransition
 import Navbar from "../Navbar/Navbar";
 import Sidebar from "../Sidebar/Sidebar";
 import AddMenuCard from "./AddMenuCard";
@@ -89,140 +90,147 @@ const MenuBoard = () => {
   };
 
   return (
-    <div className="main-content menu-board container-fluid p-0">
-      <div className="row g-0">
-        <Sidebar />
-        <div className="col-10 col-lg-11">
-          <Navbar
-            isLoggedIn={isLoggedIn}
-            username={username}
-            searchQuery={searchQuery}
-            handleSearchChange={handleSearchChange}
-            handleLogout={handleLogout}
-          />
+    <CSSTransition
+      in={true} // Ensure it’s always in the transition state
+      timeout={300} // Duration of the transition
+      classNames="fade" // CSS class to define transitions
+      unmountOnExit
+    >
+      <div className="main-content menu-board container-fluid p-0">
+        <div className="row g-0">
+          <Sidebar />
+          <div className="col-10 col-lg-11">
+            <Navbar
+              isLoggedIn={isLoggedIn}
+              username={username}
+              searchQuery={searchQuery}
+              handleSearchChange={handleSearchChange}
+              handleLogout={handleLogout}
+            />
 
-          {notification && (
-            <div
-              className="alert alert-success position-fixed"
-              style={{
-                top: "80px",
-                right: "20px",
-                zIndex: 1050,
-                minWidth: "250px",
-              }}
-            >
-              {notification}
-            </div>
-          )}
-
-          <div className="d-flex justify-content-between align-items-center p-4">
-            <h2 className="fw-bold">List Menu</h2>
-            <p className="text-muted mb-0" style={{ marginRight: "380px" }}>
-              Total: {filteredMenus.length} Menus
-            </p>
-          </div>
-
-          <div className="d-flex gap-3 px-4 mb-4">
-            {["All Menu", "Foods", "Beverages", "Desserts"].map((category) => (
-              <button
-                key={category}
-                className={`btn ${
-                  activeCategory === category
-                    ? "btn-primary text-white"
-                    : "btn-outline-primary"
-                }`}
-                style={{ padding: "5px 10px", width: "175px", height: "55px" }}
-                onClick={() => handleCategoryClick(category)}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-
-          <div className="row px-4">
-            <div className="col-lg-9">
+            {notification && (
               <div
+                className="alert alert-success position-fixed"
                 style={{
-                  maxHeight: "600px",
-                  overflowY: "auto",
-                  paddingRight: "10px",
+                  top: "80px",
+                  right: "20px",
+                  zIndex: 1050,
+                  minWidth: "250px",
                 }}
               >
-                <div className="row row-cols-1 row-cols-md-3 g-4">
-                  {filteredMenus.map((menuItem) => (
-                    <div
-                      key={menuItem._id}
-                      className="col"
-                      onClick={() => setSelectedMenu(menuItem)}
-                    >
-                      <div className="card h-100">
-                        <span
-                          className="badge bg-primary"
-                          style={{
-                            fontSize: "0.7rem",
-                            padding: "3px 8px",
-                            borderRadius: "20px",
-                            position: "absolute",
-                            top: "5px",
-                            right: "5px",
-                            zIndex: "10",
-                          }}
-                        >
-                          {menuItem.category}
-                        </span>
-                        <img
-                          src={
-                            menuItem.image
-                              ? menuItem.image // Gunakan URL lengkap dari API
-                              : `${BASE_URL}/assets/default-image.jpg`
-                          }
-                          className="card-img-top"
-                          alt={menuItem.name}
-                          style={{ height: "150px", objectFit: "cover" }}
-                        />
-                        <div className="card-body">
-                          <h5 className="card-title">{menuItem.name}</h5>
-                          <p className="card-text text-muted">
-                            {menuItem.description}
-                          </p>
-                          <p className="card-text">
-                            <span
-                              style={{
-                                color: "#3572EF",
-                                fontWeight: "bold",
-                                fontSize: "1rem",
-                              }}
-                            >
-                              Rp {menuItem.price.toLocaleString("id-ID")}
-                            </span>{" "}
-                            <span style={{ color: "black" }}>/portion</span>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {notification}
               </div>
+            )}
+
+            <div className="d-flex justify-content-between align-items-center p-4">
+              <h2 className="fw-bold">List Menu</h2>
+              <p className="text-muted mb-0" style={{ marginRight: "380px" }}>
+                Total: {filteredMenus.length} Menus
+              </p>
             </div>
 
-            <div className="col-lg-3">
-              <AddMenuCard
-                menus={menus}
-                setMenus={setMenus}
-                onMenuAdded={handleMenuAdded}
-              />
+            <div className="d-flex gap-3 px-4 mb-4">
+              {["All Menu", "Foods", "Beverages", "Desserts"].map((category) => (
+                <button
+                  key={category}
+                  className={`btn ${
+                    activeCategory === category
+                      ? "btn-primary text-white"
+                      : "btn-outline-primary"
+                  }`}
+                  style={{ padding: "5px 10px", width: "175px", height: "55px" }}
+                  onClick={() => handleCategoryClick(category)}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+
+            <div className="row px-4">
+              <div className="col-lg-9">
+                <div
+                  style={{
+                    maxHeight: "600px",
+                    overflowY: "auto",
+                    paddingRight: "10px",
+                  }}
+                >
+                  <div className="row row-cols-1 row-cols-md-3 g-4">
+                    {filteredMenus.map((menuItem) => (
+                      <div
+                        key={menuItem._id}
+                        className="col"
+                        onClick={() => setSelectedMenu(menuItem)}
+                      >
+                        <div className="card h-100">
+                          <span
+                            className="badge bg-primary"
+                            style={{
+                              fontSize: "0.7rem",
+                              padding: "3px 8px",
+                              borderRadius: "20px",
+                              position: "absolute",
+                              top: "5px",
+                              right: "5px",
+                              zIndex: "10",
+                            }}
+                          >
+                            {menuItem.category}
+                          </span>
+                          <img
+                            src={
+                              menuItem.image
+                                ? menuItem.image // Gunakan URL lengkap dari API
+                                : `${BASE_URL}/assets/default-image.jpg`
+                            }
+                            className="card-img-top"
+                            alt={menuItem.name}
+                            style={{ height: "150px", objectFit: "cover" }}
+                          />
+                          <div className="card-body">
+                            <h5 className="card-title">{menuItem.name}</h5>
+                            <p className="card-text text-muted">
+                              {menuItem.description}
+                            </p>
+                            <p className="card-text">
+                              <span
+                                style={{
+                                  color: "#3572EF",
+                                  fontWeight: "bold",
+                                  fontSize: "1rem",
+                                }}
+                              >
+                                Rp {menuItem.price.toLocaleString("id-ID")}
+                              </span>{" "}
+                              <span style={{ color: "black" }}>/portion</span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-lg-3">
+                <AddMenuCard
+                  menus={menus}
+                  setMenus={setMenus}
+                  onMenuAdded={handleMenuAdded}
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {selectedMenu && (
-        <DetailMenuModal
-          menu={selectedMenu}
-          onClose={() => setSelectedMenu(null)}
-        />
-      )}
-    </div>
+        {selectedMenu && (
+          <DetailMenuModal
+            menu={selectedMenu}
+            onClose={() => setSelectedMenu(null)}
+          />
+        )}
+      </div>
+    </CSSTransition>
   );
 };
 
